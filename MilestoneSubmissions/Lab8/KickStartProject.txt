@@ -1,0 +1,61 @@
+1. Team number: 015-4
+
+2. Team name: Spotify crew
+
+3.  Adie Hofle (github: adiehofle, email: adho1327@colorado.edu), 
+    Juan Marin (github: juma9363, email: juma9363@colorado.edu), 
+    David Todd (github: MercyToad email: dato3889@colorado.edu), 
+    Nisha Iyengar (github: niiy5734, email: niiy5734@colorado.edu)
+    Aayush Sharma (github: AayushSharma29, email: Aash7867@colorado.edu)
+
+4. Application name: Spotify song rater
+
+5. Application Description: -We give users the ability to log songs they listen to,
+    rate them, and possibly add a description/other details about them. If the user likes a song, 
+    they can view similar songs, which will return a list of songs that have similar attributes 
+    and were rated highly among users who also rated the requested song highly. 
+    -Using the Spotify API to not only retrieve the actual song/artist/album, 
+    but to retrieve pre-defined Spotify song characteristics (like danceability, loudness, etc), 
+    we will be able to let users review any song on Spotify, and allow their review to influence their song recommendations.
+    -We will have a profile feature where you can view all of a user's reviews. 
+    -If we have time, we are hoping to be able to add other features for album reviews or artist reviews.
+
+6. Audience: Music listeners seeking a way to create logs of songs and/or albums, view and post recommendations/other notes to expand their listening.
+
+7. Vision Statement: For Spotify users who want to expand their listening based on real people’s opinions, not just numbers. 
+
+8. Version Control: Done
+
+9. Development Methodology: Agile with reports of what’s been finished and what is planned to be completed every Monday, Wednesday, and Friday.
+
+10. Communication Plan: We plan to have most of our communications on Discord.
+
+11. Meeting Plan: 1:30 pm Wednesday in ECCS 114H (See https://www.when2meet.com/?33151374-TmRec for availability times)
+
+12. Use Case Diagram: [See image]
+
+13. Wireframes: [See images]
+
+
+Extra credit:Potential risks
+a. Too high scope for timeframe - 
+    we will work in an iterative MVP style, 
+    and start by creating a functional app with the very base features, 
+    and work from there so we aren’t stuck with half a project at the end
+
+b. Spotify API potentially difficult to work with-
+    we will try to get our spotify queries to be some of the first to run 
+    so that if we run into any challenges, we have the entire time to remedy them
+
+c. Balancing work with busy schedules- we will check in with our TA once a week, 
+    and check in with one another three times a week to hold ourselves accountable and ensure we are on track to hit goals.
+
+d. Trouble dividing work to make sure everyone is using their strengths and interests (small risk) - 
+    we already have a lack of interest in developing the frontend as compared with the backend.
+    For tasks like these that no one wants to do, we can try to 
+    divide it up evenly amongst ourselves so no one is stuck doing all of it.
+
+e. Differing ideas for the final product- 
+    we will continue to check in with one another and create plans 
+    before fleshing an idea out completely, so that everyone is on board with it. 
+    We will make sure to have very frequent communication.
