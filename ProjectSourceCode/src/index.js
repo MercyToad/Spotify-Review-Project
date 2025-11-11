@@ -43,3 +43,14 @@ db.connect()
     console.log('ERROR:', error.message || error);
   });
 
+
+  // -------- Endpoints ------------- //
+
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
+// server?
+
+module.exports = app.listen(3000);
+console.log('Server is listening on port 3000');
