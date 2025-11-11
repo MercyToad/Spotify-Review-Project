@@ -21,6 +21,34 @@ const hbs = handlebars.create({
   partialsDir: __dirname + '/views/partials',
 });
 
+//- ****** ADDED: SERVER CONFIGURATION ****** -//
+// Register `hbs` as the view engine
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Setup body-parser
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
+// Setup express.static to serve resources
+// We should fix the typo here ...
+app.use(express.static(path.join(__dirname, 'resourses')));
+
+// Setup session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'supersecretkey', // CHANGE THIS!
+    saveUninitialized: false,
+    resave: false,
+  })
+);
+//- ****** END OF ADDED SERVER CONFIGURATION ****** -//
+
 
 // database configuration
 const dbConfig = {
@@ -44,70 +72,57 @@ db.connect()
   });
 
 
+//- ****** ADDED: NEW ROUTES ****** -//
+app.get('/', (req, res) => {
+  res.redirect('/home'); // Redirect root to home page
+});
+
+app.get('/home', (req, res) => {
+  res.render('pages/home'); 
+});
+//- ****** END OF ADDED NEW ROUTES ****** -//
 
 
+//- ****** UNCOMMENTED FROM LAB 7 ****** -//
+// (un-commented) 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
-console.log('Server is listening on port 3000');
-
-
-
-
-
-
-
-
-
-/*  FROM LAB 7
-  
 // Login Page
 app.get('/login', (req, res) => {
-  res.render('pages/login', { layout: 'main' });
+  res.render('pages/login'); // Removed layout: 'main', it's default
 });
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);   Searches db if the username exists
+    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]); // Searches db if the username exists
 
     if (!user) {
-      return res.redirect('/register');
+      // User not found
+      return res.status(401).render('pages/login', {
+        error: "User not found. Please register.",
+      });
     }
 
     if (await bcrypt.compare(password, user.password)) {
       req.session.user = { id: user.id, username: user.username };
-      return res.redirect('/discover');
+      // Redirect to /home instead of /discover
+      return res.redirect('/home');
     } else {
+      // Incorrect password
       return res.status(401).render('pages/login', {
-        layout: 'main',
+        error: "Incorrect password.",
       });
     }
   } catch (error) {
     console.error(error);
+    res.render('pages/login', { error: 'An error occurred.' });
   }
 });
 
-
-
 // Registration Page
 app.get('/register', (req, res) => {
-  res.render('pages/register', { layout: 'main' });
+  res.render('pages/register'); // Removed layout: 'main'
 });
 
 app.post('/register', async (req, res) => {
@@ -122,8 +137,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
-
 // Authentication Middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
@@ -132,15 +145,14 @@ const auth = (req, res, next) => {
   }
   next();
 };
+
 // Authentication Required
-app.use(auth);
-
-
+// Any routes *below* this line will require a user to be logged in.
 
 // Discover Page
 const API_KEY = process.env.API_KEY;
 
-app.get('/discover', async (req, res) => {
+app.get('/discover', auth, async (req, res) => {
   const keyword = 'music'; // Can be changed
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${keyword}&size=12`;// change size here for more options
 
@@ -154,16 +166,19 @@ app.get('/discover', async (req, res) => {
   }
 });
 
-
-
 // Logout Page
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).send('Could not log out.');
     }
-    res.render('pages/logout');
+    // Render a logout page, or just redirect to login
+    res.redirect('/login');
   });
 });
+//- ****** END OF UNCOMMENTED BLOCK ****** -//
 
-*/
+
+// starting the server and keeping the connection open to listen for more requests
+app.listen(3000);
+console.log('Server is listening on port 3000');
