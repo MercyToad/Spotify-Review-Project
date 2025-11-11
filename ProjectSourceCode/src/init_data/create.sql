@@ -53,8 +53,10 @@ CREATE TABLE song_to_artist (
 --    created_at TIMESTAMP DEFAULT NOW()
 --);
 
--- CREATE TABLE playlist_to_song ()
-
+-- CREATE TABLE playlist_to_song (
+--    song_id VARCHAR(64) REFERENCES song(song_id) ON DELETE CASCADE ON UPDATE CASCADE,
+--    playlist_id VARCHAR(64) REFERENCES song(song_id) ON DELETE CASCADE ON UPDATE CASCADE,
+--    PRIMARY KEY (song_id, playlist_id))
 
 
 
