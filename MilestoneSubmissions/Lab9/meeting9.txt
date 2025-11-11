@@ -1,0 +1,9 @@
+11/6:
+Duration: ~10 minutes
+
+During our meeting, we talked about that we were able to obtain Spotify's API, how we 
+started working on the login, registration, home pages, and the tables for the data 
+the app will use. In the next week, we plan on finishing the login and registration pages, as well as
+continuing to work on the home page and making sure that the database works with Spotify's API. We still 
+plan to mostly have Juan and Nisha work on the front-end, Adie and Nisha on the backend, 
+and David and Zach on the API and database.

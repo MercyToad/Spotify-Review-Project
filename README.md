@@ -9,3 +9,13 @@ David Todd,
 Nisha Iyengar, 
 Aayush Sharma, 
 Zack Biehl
+
+Technology stack used in this project:
+
+Prerequisites to run the application:
+
+How to run app locally:
+
+How to run tests:
+
+Link to the deployed application:

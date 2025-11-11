@@ -7,3 +7,16 @@ We also talked about our wireframes and who will be focusing on what parts of th
 The current plan is to have Juan and Nisha work on the front-end, Adie and Nisha work on the backend, 
 and David work on the API and database, with each of us also helping where it is needed. 
 Another topic that we talked about was the Spotify API and how we are going to access it and attempt to use it with our app.
+
+
+
+
+11/6:
+Duration: ~10 minutes
+
+During our meeting, we talked about that we were able to obtain Spotify's API, how we 
+started working on the login, registration, home pages, and the tables for the data 
+the app will use. In the next week, we plan on finishing the login and registration pages, as well as
+continuing to work on the home page and making sure that the database works with Spotify's API. We still 
+plan to mostly have Juan and Nisha work on the front-end, Adie and Nisha on the backend, 
+and David and Zach on the API and database.
