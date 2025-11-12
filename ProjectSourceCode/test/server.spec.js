@@ -30,29 +30,57 @@ describe('Server!', () => {
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
-describe('Testing Add User API', () => {
-  it('positive : /add_user', done => {
+// describe('Testing Add User API', () => {
+//   it('positive : /add_user', done => {
+//     chai
+//       .request(server)
+//       .post('/register')
+//       .send({username: 'jdoe', password: 'password'})
+//       .end((err, res) => {
+//         // expect(res.body.message).to.equals('User added successfully');
+//         if (err) {
+//           return done(err);
+//         }
+
+//         // 2. Handle assertion errors
+//         // Use try/catch so if 'expect' fails, we still call done()
+//         try {
+//           // Your assertions go here
+//           expect(res).to.have.status(201);
+//           // expect(res.body.message).to.equals('User added successfully');
+
+//           done(); // <-- Call done() only on success
+//         } catch (assertionError) {
+//           done(assertionError); // <-- Pass the assertion error to done()
+//         }
+//       });
+//   });
+// });
+
+describe('Testing Register API', () => {
+  it('positive : /register', done => {
     chai
       .request(server)
       .post('/register')
-      .send({username: 'jdoe', password: 'password'})
+      .send({username: 'username', password: 'password'})
       .end((err, res) => {
-        // expect(res.body.message).to.equals('User added successfully');
-        if (err) {
-          return done(err);
-        }
+        expect(res).to.have.status(201);
+        expect(res.body.message).to.equals('Success');
+        done();
+      });
+  });
+});
 
-        // 2. Handle assertion errors
-        // Use try/catch so if 'expect' fails, we still call done()
-        try {
-          // Your assertions go here
-          expect(res).to.have.status(201);
-          // expect(res.body.message).to.equals('User added successfully');
-
-          done(); // <-- Call done() only on success
-        } catch (assertionError) {
-          done(assertionError); // <-- Pass the assertion error to done()
-        }
+describe('Testing Register API No Username', () => {
+  it('negative : /register', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({password: 'passwrod'})
+      .end((err, res) => {
+        expect(res).to.have.status(400);
+        // expect(res.body.message).to.equals('Must enter username and password'); -> no message because it will be rendered as a message
+        done();
       });
   });
 });

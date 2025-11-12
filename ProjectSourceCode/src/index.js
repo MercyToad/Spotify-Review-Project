@@ -73,7 +73,8 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
   if (!req.body.username || !req.body.password) {
-    return res.render('pages/register.hbs', {
+    return res.status(400)
+    .render('pages/register.hbs', {
       message: "Must enter username and password",
       error: true,
     }); 
@@ -82,7 +83,9 @@ app.post('/register', async (req, res) => {
   try {
     var query = `INSERT INTO users (username, password) VALUES ('${req.body.username}','${hash}');`
     await db.none(query);
-    res.status(201); //to-do:reroute to main page
+    res.status(201).json({
+      message: 'Success'
+    }); //to-do:reroute to main page
   }
   catch (err) {
     console.log(err);
