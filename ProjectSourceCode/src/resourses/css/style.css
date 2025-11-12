@@ -173,6 +173,67 @@
     transform: scale(1.05);
   }
   
+  /* Profile Container & Accordion Menu */
+  .header-profile-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    min-width: 200px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 100;
+  }
+  
+  .profile-menu.active {
+    max-height: 400px;
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .profile-menu-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.875rem;
+  }
+  
+  .profile-menu-item:hover {
+    background-color: var(--muted-background);
+    color: var(--spotify-green);
+  }
+  
+  .profile-menu-item.logout {
+    color: #ff6b6b;
+  }
+  
+  .profile-menu-item.logout:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+  }
+  
+  .profile-menu-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.5rem 0;
+  }
+  
   
   /* --- Home Page (from home.hbs) --- */
   .content-section {
@@ -439,4 +500,147 @@
     gap: 0.25rem;
     font-size: 0.875rem;
     color: var(--foreground);
+  }
+
+  /* --- Authentication Pages (Login/Register) --- */
+  .auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+  }
+
+  .auth-card {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .auth-logo {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(to bottom right, #22c55e, #10b981);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 auto 1rem;
+  }
+
+  .auth-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  .form-input {
+    padding: 0.75rem 1rem;
+    background-color: oklch(0.205 0 0);
+    border: 1px solid var(--border-color);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--foreground);
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .form-input::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--spotify-green);
+    background-color: oklch(0.215 0 0);
+  }
+
+  .btn-primary {
+    padding: 0.875rem 1.5rem;
+    background-color: var(--spotify-green);
+    color: white;
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #1ed760;
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .auth-footer {
+    text-align: center;
+  }
+
+  .auth-footer p {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  .auth-link {
+    color: var(--spotify-green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .auth-link:hover {
+    color: #1ed760;
+    text-decoration: underline;
+  }
+
+  /* Error Message */
+  .error-message {
+    padding: 0.75rem 1rem;
+    background-color: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+    border-radius: calc(var(--radius) - 2px);
+    color: #ff6b6b;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    text-align: center;
   }

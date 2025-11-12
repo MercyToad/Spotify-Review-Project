@@ -88,7 +88,7 @@ app.get('/home', (req, res) => {
 
 // Login Page
 app.get('/login', (req, res) => {
-  res.render('pages/login'); // Removed layout: 'main', it's default
+  res.render('pages/login', { layout: 'auth' });
 });
 
 app.post('/login', async (req, res) => {
@@ -100,6 +100,7 @@ app.post('/login', async (req, res) => {
     if (!user) {
       // User not found
       return res.status(401).render('pages/login', {
+        layout: 'auth',
         error: "User not found. Please register.",
       });
     }
@@ -111,18 +112,19 @@ app.post('/login', async (req, res) => {
     } else {
       // Incorrect password
       return res.status(401).render('pages/login', {
+        layout: 'auth',
         error: "Incorrect password.",
       });
     }
   } catch (error) {
     console.error(error);
-    res.render('pages/login', { error: 'An error occurred.' });
+    res.render('pages/login', { layout: 'auth', error: 'An error occurred.' });
   }
 });
 
 // Registration Page
 app.get('/register', (req, res) => {
-  res.render('pages/register'); // Removed layout: 'main'
+  res.render('pages/register', { layout: 'auth' });
 });
 
 app.post('/register', async (req, res) => {
@@ -133,7 +135,10 @@ app.post('/register', async (req, res) => {
     res.redirect('/login');
   } catch (error) {
     console.error('Error during registration:', error.message);
-    res.redirect('/register');
+    res.status(400).render('pages/register', { 
+      layout: 'auth',
+      error: 'Username already exists or another error occurred.' 
+    });
   }
 });
 
