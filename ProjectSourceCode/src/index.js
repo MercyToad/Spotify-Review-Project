@@ -33,6 +33,11 @@ const dbConfig = {
 
 const db = pgp(dbConfig);
 
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+
 // test your database
 db.connect()
   .then(obj => {
@@ -43,129 +48,123 @@ db.connect()
     console.log('ERROR:', error.message || error);
   });
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
+
+  // -------- Endpoints ------------- //
+
+  /* VERY IMPORTANT NOTE: I WILL MAKE THESE ENDPOINTS WORK LATER I JSUT WANTED TO GET THEM DONE SO I CAN WORK ON OTHER HW*/
 
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
 
 
+//Register page
+app.get('/', (req,res) => {
+    res.redirect('/register');
+})
+
+app.get('/register', (req, res) => {
+  res.render('pages/register.hbs');
+});
+
+app.post('/register', async (req, res) => {
+  if (!req.body.username || !req.body.password) {
+    return res.render('pages/register.hbs', {
+      message: "Must enter username and password",
+      error: true,
+    }); 
+  }
+  const hash = await bcrypt.hash(req.body.password, 10);
+  try {
+    await db.none(
+    'INSERT INTO users (username, password) VALUES ($1, $2)',
+    [req.body.username, hash]
+    );  res.redirect('/login');//to-do:reroute to main page (currently reroutes to login page)
+  }
+  catch (err) {
+    console.log(err);
+    res.status(400).json({
+      error: err,
+    });
+  }
+});
 
 
-
-
-
-
-
-
-
-
-
-
-// starting the server and keeping the connection open to listen for more requests
-//app.listen(3000);
-module.exports = app.listen(3000);
-console.log('Server is listening on port 3000');
-
-
-
-
-
-
-
-
-
-/*  FROM LAB 7
-  
-// Login Page
+//login page
 app.get('/login', (req, res) => {
-  res.render('pages/login', { layout: 'main' });
+  res.render('pages/login.hbs');
 });
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
+  // Validate input
+  if (!username || !password) {
+    return res.status(400).json({
+      message: 'Must enter username and password',
+      error: true
+    });
+  }
+
+
   try {
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);   Searches db if the username exists
+    // Secure, parameterized query
+    const user = await db.oneOrNone(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
 
+    // User not found
     if (!user) {
-      return res.redirect('/register');
-    }
-
-    if (await bcrypt.compare(password, user.password)) {
-      req.session.user = { id: user.id, username: user.username };
-      return res.redirect('/discover');
-    } else {
-      return res.status(401).render('pages/login', {
-        layout: 'main',
+      return res.render('pages/login.hbs', {
+        message: 'User not found. Please register first.',
+        error: true,
       });
     }
-  } catch (error) {
-    console.error(error);
-  }
-});
 
-
-
-// Registration Page
-app.get('/register', (req, res) => {
-  res.render('pages/register', { layout: 'main' });
-});
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const hash = await bcrypt.hash(password, 10);
-    await db.none('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
-    res.redirect('/login');
-  } catch (error) {
-    console.error('Error during registration:', error.message);
-    res.redirect('/register');
-  }
-});
-
-
-
-// Authentication Middleware.
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect('/login');
-  }
-  next();
-};
-// Authentication Required
-app.use(auth);
-
-
-
-// Discover Page
-const API_KEY = process.env.API_KEY;
-
-app.get('/discover', async (req, res) => {
-  const keyword = 'music'; // Can be changed
-  const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${keyword}&size=12`;// change size here for more options
-
-  try {
-    const response = await axios.get(url);
-    const events = response.data._embedded?.events || [];
-    res.render('pages/discover', { results: events });
-  } catch (error) {
-    console.error('API error:', error.message);
-    res.render('pages/discover', { results: [], error: 'Could not load events.' });
-  }
-});
-
-
-
-// Logout Page
-app.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).send('Could not log out.');
+    // Compare password
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.render('pages/login.hbs', {
+        message: 'Password is incorrect.',
+        error: true,
+      });
     }
-    res.render('pages/logout');
-  });
+
+    // You can set session info here if you wish:
+    // req.session.user = { id: user.user_id, username: user.username };
+
+    console.log(`✅ User '${username}' logged in successfully.`);
+    return res.redirect('/home'); // or whatever the home page 
+
+  } catch (err) {
+    console.error('Login error:', err);
+    return res.status(500).render('pages/login.hbs', {
+      message: 'Internal server error. Please try again later.',
+      error: true,
+    });
+  }
 });
 
+
+//home page
+app.get('/home', (req, res) => res.status(200).send('Welcome home'));
+
+// server?
+
+module.exports = app.listen(3000);
+console.log('Server is listening on port 3000');
+
+/*
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(3000, () => console.log('Server is listening on port 3000'));
+}
+
+module.exports = app;
 */

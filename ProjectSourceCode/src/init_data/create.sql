@@ -3,9 +3,9 @@
 -- USERS
 -- ============================
 CREATE TABLE IF NOT EXISTS  users (
-    user_id BIGSERIAL PRIMARY KEY,
+    user_id BIGSERIAL UNIQUE PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -80,3 +80,4 @@ CREATE TABLE IF NOT EXISTS  review (
 );
 
 CREATE INDEX idx_review_target ON review(target_type, target_id);
+
