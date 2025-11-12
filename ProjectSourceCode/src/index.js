@@ -48,64 +48,41 @@ db.connect()
   });
 
 
-// Middleware
-app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Initialize session variables
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-  })
-);
-
-// // FIXED: Changed 'resources' to 'resourses' to match your folder name
-app.use(
-  express.static(path.join(__dirname, 'resources'))
-);
-
-// -------- Endpoints ------------- //
-
-  /* VERY IMPORTANT NOTE: I WILL MAKE THESE ENDPOINTS WORK LATER I JSUT WANTED TO GET THEM DONE SO I CAN WORK ON OTHER HW*/
 
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
 
-app.get('/', (req,res) => {
-    res.redirect('/login');
-})
 
-app.get('/register', (req, res) => {
-  res.render('pages/register.hbs');
-});
 
-app.post('/register', async (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    return res.status(400)
-    .render('pages/register.hbs', {
-      message: "Must enter username and password",
-      error: true,
-    }); 
-  }
-  const hash = await bcrypt.hash(req.body.password, 10);
-  try {
-    var query = `INSERT INTO users (username, password) VALUES ('${req.body.username}','${hash}');`
-    await db.none(query);
-    res.status(201).render('pages/home.hbs', {
-      message: 'Success'
-    }); //to-do:reroute to main page
-  }
-  catch (err) {
-    console.log(err);
-    res.status(400).json({
-      error: err,
-    });
-  }
-});
 
+
+
+
+
+
+
+
+
+
+
+
+// starting the server and keeping the connection open to listen for more requests
+//app.listen(3000);
+module.exports = app.listen(3000);
+console.log('Server is listening on port 3000');
+
+
+
+
+
+
+
+
+
+/*  FROM LAB 7
+  
+// Login Page
 app.get('/login', (req, res) => {
   res.render('pages/login.hbs');
 });
