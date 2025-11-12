@@ -2,7 +2,8 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     spotify_id VARCHAR(100) UNIQUE,  -- Spotify user ID (from their account)
-    user_name VARCHAR(100),       
+    username VARCHAR(100),
+    password VARCHAR(100), 
     email VARCHAR(255),              
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
