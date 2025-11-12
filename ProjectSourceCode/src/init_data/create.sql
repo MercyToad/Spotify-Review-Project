@@ -1,6 +1,9 @@
 
 -- ============================
 -- USERS
+
+-- ============================
+-- USERS
 -- ============================
 CREATE TABLE users (
     user_id BIGSERIAL PRIMARY KEY,

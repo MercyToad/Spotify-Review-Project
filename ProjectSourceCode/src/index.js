@@ -60,12 +60,11 @@ app.use(
   })
 );
 
-// FIXED: Changed 'resources' to 'resourses' to match your folder name
 app.use(
   express.static(path.join(__dirname, 'resourses'))
 );
 
-// Home/Welcome route
+// Home route
 app.get('/', (req, res) => {
   res.redirect('/login');
 });
