@@ -17,10 +17,14 @@ const axios = require('axios'); // To make HTTP requests from our server. We'll 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
   extname: 'hbs',
-  layoutsDir: __dirname + '/views/layouts',
-  partialsDir: __dirname + '/views/partials',
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials'),
 });
 
+// Register `hbs` as our view engine using its bound `engine()` function.
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
 
 // database configuration
 const dbConfig = {
@@ -33,11 +37,6 @@ const dbConfig = {
 
 const db = pgp(dbConfig);
 
-app.engine('hbs', hbs.engine);
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-
 // test your database
 db.connect()
   .then(obj => {
@@ -48,123 +47,138 @@ db.connect()
     console.log('ERROR:', error.message || error);
   });
 
+// Middleware
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Initialize session variables
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
   })
 );
 
+app.use(
+  express.static(path.join(__dirname, 'resources'))
+);
 
-  // -------- Endpoints ------------- //
-
-  /* VERY IMPORTANT NOTE: I WILL MAKE THESE ENDPOINTS WORK LATER I JSUT WANTED TO GET THEM DONE SO I CAN WORK ON OTHER HW*/
+// Home route
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
 
 app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+  res.status(200).json({ status: 'success', message: 'Welcome!' });
 });
 
 
-//Register page
-app.get('/', (req,res) => {
-    res.redirect('/register');
-})
-
-app.get('/register', (req, res) => {
-  res.render('pages/register.hbs');
-});
-
-app.post('/register', async (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    return res.render('pages/register.hbs', {
-      message: "Must enter username and password",
-      error: true,
-    }); 
-  }
-  const hash = await bcrypt.hash(req.body.password, 10);
-  try {
-    await db.none(
-    'INSERT INTO users (username, password) VALUES ($1, $2)',
-    [req.body.username, hash]
-    );  res.redirect('/login');//to-do:reroute to main page (currently reroutes to login page)
-  }
-  catch (err) {
-    console.log(err);
-    res.status(400).json({
-      error: err,
-    });
-  }
-});
-
-
-//login page
+// Login Page
 app.get('/login', (req, res) => {
-  res.render('pages/login.hbs');
+  res.render('pages/login', { layout: 'auth' });
 });
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  // Validate input
-  if (!username || !password) {
-    return res.status(400).json({
-      message: 'Must enter username and password',
-      error: true
-    });
-  }
-
-
   try {
-    // Secure, parameterized query
-    const user = await db.oneOrNone(
-      'SELECT * FROM users WHERE username = $1',
-      [username]
-    );
+    // Query using the correct column names from create.sql
+    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
 
-    // User not found
     if (!user) {
-      return res.render('pages/login.hbs', {
-        message: 'User not found. Please register first.',
-        error: true,
+      return res.render('pages/login', {
+        layout: 'auth',
+        error: 'Username not found. Please register.'
       });
     }
 
-    // Compare password
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.render('pages/login.hbs', {
-        message: 'Password is incorrect.',
-        error: true,
+    // Compare password with the password from database
+    if (await bcrypt.compare(password, user.password_hash)) {
+      req.session.user = { 
+        id: user.user_id,  // Using user_id from create.sql
+        username: user.username 
+      };
+      req.session.save();
+      return res.redirect('/home');
+    } else {
+      return res.render('pages/login', {
+        layout: 'auth',
+        error: 'Incorrect password.'
       });
     }
-
-    // You can set session info here if you wish:
-    // req.session.user = { id: user.user_id, username: user.username };
-
-    console.log(`✅ User '${username}' logged in successfully.`);
-    return res.redirect('/home'); // or whatever the home page 
-
-  } catch (err) {
-    console.error('Login error:', err);
-    return res.status(500).render('pages/login.hbs', {
-      message: 'Internal server error. Please try again later.',
-      error: true,
+  } catch (error) {
+    console.error('Login error:', error);
+    res.render('pages/login', {
+      layout: 'auth',
+      error: 'An error occurred during login.'
     });
   }
 });
 
 
-//home page
-app.get('/home', (req, res) => res.status(200).send('Welcome home'));
+// Register Page GET
+app.get('/register', (req, res) => {
+  res.render('pages/register', { layout: 'auth' });
+});
 
-// server?
+// Register Page POST
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    // Check if username already exists
+    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+    
+    if (existingUser) {
+      return res.render('pages/register', {
+        layout: 'auth',
+        error: 'Username already exists. Please choose another.'
+      });
+    }
+    //hash password
+    const hash = await bcrypt.hash(password, 10);
+    
+    // Insert new user into database
+    await db.none('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
+    
+    // Redirect to login page after successful registration
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.render('pages/register', {
+      layout: 'auth',
+      error: 'An error occurred during registration. Please try again.'
+    });
+  }
+});
 
+// Authentication Middleware
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+};
+
+// Home Page (protected)
+app.get('/home', auth, (req, res) => {
+  res.render('pages/home', { 
+    layout: 'main',
+    username: req.session.user.username 
+  });
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Could not log out.');
+    }
+    res.redirect('/login');
+  });
+});
+
+// starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
-
-/*
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(3000, () => console.log('Server is listening on port 3000'));
-}
-
-module.exports = app;
-*/

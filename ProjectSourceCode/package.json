@@ -1,5 +1,5 @@
 {
-  "name": "song_rater",
+  "name": "spotify_rating",
   "main": "src/index.js",
   "dependencies": {
     "express": "^4.6.1",

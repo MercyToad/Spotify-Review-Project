@@ -1,0 +1,646 @@
+/* --- Global & Spotify Variables --- */
+:root {
+   
+    --spotify-green: #1DB954; /* Keeping this classic green */
+    --background: oklch(0.145 0 0);        /* from --background */
+    --foreground: oklch(0.985 0 0);        /* from --foreground */
+    --card-background: oklch(0.145 0 0); /* from --card */
+    --muted-background: oklch(0.269 0 0);  /* from --muted / --accent */
+    --muted-foreground: oklch(0.708 0 0);  /* from --muted-foreground */
+    --border-color: oklch(0.269 0 0);      /* from --border */
+    --radius: 0.625rem; /* from --radius (10px) */
+  
+    /* Fonts  */
+    --font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
+  }
+  
+  /* --- General Page Setup --- */
+  body {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-normal);
+    background-color: var(--background);
+    color: var(--foreground);
+    margin: 0;
+    padding: 0;
+
+    padding-bottom: 80px;
+    position: relative;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  
+  h1, h2, h3, p {
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1, h2, h3 {
+    font-weight: var(--font-weight-medium);
+  }
+  
+  a {
+    color: var(--foreground);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  a:hover {
+    color: var(--spotify-green);
+  }
+  
+  /* ---  Main Layout Shell (from main.hbs) --- */
+  
+  /* --- Header (from header.hbs) --- */
+  .site-header {
+    background-color: oklch(0.145 0 0 / 0.8); 
+    backdrop-filter: blur(4px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  
+  .header-container {
+    width: 90%;
+    max-width: 1280px; 
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  
+  /* Logo */
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(to bottom right, #22c55e, #10b981);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  
+  .logo-text {
+    color: var(--foreground);
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+  
+  /* Navigation */
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .site-nav a {
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 4px;
+  }
+  
+  .site-nav a:hover {
+    color: var(--foreground);
+    border-bottom-color: var(--spotify-green);
+  }
+  
+  /* Search Bar */
+  .header-search {
+    flex: 1;
+    max-width: 28rem;
+    position: relative;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-foreground);
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    padding-left: 2.5rem;
+    background-color: oklch(0.205 0 0);
+    border: 1px solid var(--border-color);
+    color: var(--foreground);
+    border-radius: var(--radius);
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+  }
+  
+  .search-input::placeholder {
+    color: var(--muted-foreground);
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--spotify-green);
+  }
+  
+  /* Profile Icon */
+  .header-profile {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(to bottom right, #a855f7, #ec4899);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .header-profile:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Profile Container & Accordion Menu */
+  .header-profile-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    min-width: 200px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 100;
+  }
+  
+  .profile-menu.active {
+    max-height: 400px;
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .profile-menu-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.875rem;
+  }
+  
+  .profile-menu-item:hover {
+    background-color: var(--muted-background);
+    color: var(--spotify-green);
+  }
+  
+  .profile-menu-item.logout {
+    color: #ff6b6b;
+  }
+  
+  .profile-menu-item.logout:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+  }
+  
+  .profile-menu-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.5rem 0;
+  }
+  
+  
+  /* --- Home Page (from home.hbs) --- */
+  .content-section {
+    margin-bottom: 2.5rem; 
+  }
+  
+  .content-section h2 {
+    font-size: 1.5rem; 
+    font-weight: 700;
+    margin-bottom: 0.5rem; 
+    color: var(--foreground);
+  }
+  
+  .section-subtitle {
+    font-size: 0.875rem; 
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+  }
+  
+  /* --- Footer --- */
+  .site-footer {
+    background-color: var(--muted-background);
+    color: var(--muted-foreground);
+    padding: 1rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border-color);
+    
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px; 
+    box-sizing: border-box; 
+  }
+  
+  .footer-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  
+  /* --- NEW LAYOUT & WIDGET STYLES --- */  
+  /* Main 2-Column Layout */
+  .home-grid-layout {
+    width: 90%;
+    max-width: 1280px; 
+    margin: 2rem auto;
+    display: grid;
+    grid-template-columns: 1fr; /* Default to 1 column on mobile */
+    gap: 2rem;
+  }
+  
+  .main-content {
+    grid-column: span 1;
+  }
+  
+  .sidebar-content {
+    grid-column: span 1;
+  }
+  
+  /* Desktop Layout (for screens > 1024px) */
+  @media (min-width: 1024px) {
+    .home-grid-layout {
+      /* Create a 3-column grid, main content takes 2, sidebar takes 1 */
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .main-content {
+      grid-column: span 2; 
+    }
+    .sidebar-content {
+      grid-column: span 1;
+    }
+  }
+  
+  /* Grid for the content cards */
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .content-grid.three-col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  /* Styles for "Recommended" and "Album" cards */
+  .content-card {
+    background-color: var(--muted-background);
+    border-radius: var(--radius);
+    padding: 1rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .content-card:hover {
+    background-color: oklch(0.35 0 0); 
+  }
+  
+  .content-card img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: calc(var(--radius) - 4px);
+    margin-bottom: 1rem;
+  }
+  
+  .content-card h3 {
+    font-size: 1.125rem; 
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 0.25rem;
+  }
+  
+  .content-card p {
+    font-size: 0.875rem; 
+    color: var(--muted-foreground);
+    margin-bottom: 0.75rem;
+  }
+  
+  .card-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+  }
+  
+  .star-icon {
+    width: 1rem;
+    height: 1rem;
+    color: #facc15; 
+  }
+  
+  .review-count {
+    font-size: 0.75rem; 
+    color: var(--muted-foreground);
+    margin-left: 0.5rem;
+  }
+  
+  /* Styles for "Your Recent Reviews" cards */
+  .review-card-long {
+    background-color: var(--muted-background);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+  
+  .review-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .review-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+  }
+  
+  .review-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .review-user-info span:first-child {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  
+  .review-user-info .review-timestamp {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+  
+  .review-user-rating {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #facc15;
+    border: 1px solid #facc15;
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.375rem;
+  }
+  
+  .review-card-body .review-song-title {
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 0.125rem;
+  }
+  
+  .review-card-body .review-song-artist {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+  }
+  
+  .review-card-body .review-text {
+    font-size: 0.875rem;
+    color: var(--foreground);
+    line-height: 1.4;
+  }
+
+  /* Styles for Sidebar Widgets */
+  .sidebar-widget {
+    background-color: var(--muted-background);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .sidebar-widget h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 0.25rem;
+  }
+  
+  .widget-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .widget-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .widget-list img {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.375rem;
+  }
+  
+  .widget-list-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0; 
+  }
+  
+  .widget-list-info span:first-child {
+    font-weight: 500;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .widget-list-info span:last-child {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+  
+  .widget-list-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+  }
+
+  /* --- Authentication Pages (Login/Register) --- */
+  .auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+  }
+
+  .auth-card {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .auth-logo {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(to bottom right, #22c55e, #10b981);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 auto 1rem;
+  }
+
+  .auth-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  .form-input {
+    padding: 0.75rem 1rem;
+    background-color: oklch(0.205 0 0);
+    border: 1px solid var(--border-color);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--foreground);
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .form-input::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--spotify-green);
+    background-color: oklch(0.215 0 0);
+  }
+
+  .btn-primary {
+    padding: 0.875rem 1.5rem;
+    background-color: var(--spotify-green);
+    color: white;
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #1ed760;
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .auth-footer {
+    text-align: center;
+  }
+
+  .auth-footer p {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  .auth-link {
+    color: var(--spotify-green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .auth-link:hover {
+    color: #1ed760;
+    text-decoration: underline;
+  }
+
+  /* Error Message */
+  .error-message {
+    padding: 0.75rem 1rem;
+    background-color: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+    border-radius: calc(var(--radius) - 2px);
+    color: #ff6b6b;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }

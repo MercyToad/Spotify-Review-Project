@@ -1,18 +1,21 @@
 
 -- ============================
 -- USERS
+
 -- ============================
-CREATE TABLE IF NOT EXISTS  users (
-    user_id BIGSERIAL UNIQUE PRIMARY KEY,
+-- USERS
+-- ============================
+CREATE TABLE users (
+    user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- ============================
 -- ARTISTS
 -- ============================
-CREATE TABLE IF NOT EXISTS  artist (
+CREATE TABLE artist (
     artist_id VARCHAR(64) PRIMARY KEY,          -- Spotify artist ID
     name VARCHAR(255) NOT NULL,
     spotify_url TEXT,
@@ -23,7 +26,7 @@ CREATE TABLE IF NOT EXISTS  artist (
 -- ============================
 -- SONGS
 -- ============================
-CREATE TABLE IF NOT EXISTS  song (
+CREATE TABLE song (
     song_id VARCHAR(64) PRIMARY KEY,            -- Spotify track ID
     name VARCHAR(255) NOT NULL,
     length INTEGER NOT NULL,                    -- duration (seconds)
@@ -35,7 +38,7 @@ CREATE TABLE IF NOT EXISTS  song (
 );
 
 -- Many-to-many: Songs ↔ Artists
-CREATE TABLE IF NOT EXISTS  song_to_artist (
+CREATE TABLE song_to_artist (
     song_id VARCHAR(64) REFERENCES song(song_id) ON DELETE CASCADE ON UPDATE CASCADE,
     artist_id VARCHAR(64) REFERENCES artist(artist_id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (song_id, artist_id)
@@ -66,7 +69,7 @@ CREATE TABLE IF NOT EXISTS  song_to_artist (
 -- Enumerated target types: can be 'song', 'artist', or 'playlist'
 CREATE TYPE review_target AS ENUM ('song', 'artist', 'playlist');
 
-CREATE TABLE IF NOT EXISTS  review (
+CREATE TABLE review (
     review_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     target_type review_target NOT NULL,
@@ -80,4 +83,3 @@ CREATE TABLE IF NOT EXISTS  review (
 );
 
 CREATE INDEX idx_review_target ON review(target_type, target_id);
-
