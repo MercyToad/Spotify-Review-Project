@@ -4,5 +4,5 @@ Duration: ~15 minutes
 During our meeting, we talked about how we were able to get our login, registration, 
 and home pages mostly finished, with only minor adjustments needed. We are planning to 
 create the template for the profile page, the forms for when the user 
-is making a review/rating, and make sure that features are working as i
-ntended with the Spotify API, with the same roles that we have been using
+is making a review/rating, and make sure that features are working as 
+intended with the Spotify API, with the same roles that we have been using
