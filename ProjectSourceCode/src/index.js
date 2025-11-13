@@ -75,7 +75,7 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/', (req,res) => {
-    res.redirect('/register');
+    res.redirect('/login');
 })
 
 app.get('/register', (req, res) => {
@@ -124,14 +124,12 @@ app.post('/login', async (req, res) => {
     var user = await db.one(query);
     const match = await bcrypt.compare(req.body.password, user.password);
     if (match) {
-      console.log("1");
       // req.session.user = {id: user.id, username: user.username};
       // req.session.save();
       // console.log("2");
       res.redirect('/login'); //to-do: create home page and endpoints
     }
     else {
-      console.log("2");
       res.render('pages/login.hbs', {
         message: 'Password is incorrect',
         error: true,
