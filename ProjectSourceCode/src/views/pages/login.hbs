@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {{> message}}
 <div style="width:60%; margin:6% auto">
   <form action="/login" method="POST">
@@ -7,14 +8,65 @@
     <div class="form-group">
       <label for="exampleUsername">Username</label>
       <input type="text" class="form-control" name="username">
+=======
+{{#> layout "auth"}}
+<div class="auth-container">
+  <div class="auth-card">
+    <!-- Logo -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+      </div>
+      <h1>SongRate</h1>
+      <p class="auth-subtitle">Welcome back</p>
+>>>>>>> 126a8c2466c5016cabc4d57b31bb29fbbf0ca877
     </div>
-    <div class="form-group">
-      <label for="examplePassword">Password</label>
-      <input type="password" class="form-control" name="password">
+
+    <!-- Error Message -->
+    {{#if error}}
+      <div class="error-message">{{error}}</div>
+    {{/if}}
+
+    <!-- Login Form -->
+    <form action="/login" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Enter your username"
+          required
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Enter your password"
+          required
+          class="form-input"
+        />
+      </div>
+
+      <button type="submit" class="btn-primary">Login</button>
+    </form>
+
+    <!-- Register Link -->
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="/register" class="auth-link">Register here</a></p>
     </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-    <p> Don't have an account? 
-      <a href="./register">Register</a>
-    </p>
-  </form>
+  </div>
 </div>
+<<<<<<< HEAD
+=======
+{{/layout}}
+>>>>>>> 126a8c2466c5016cabc4d57b31bb29fbbf0ca877
