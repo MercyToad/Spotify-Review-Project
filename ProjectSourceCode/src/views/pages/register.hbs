@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {{> message}}
 
 <div style="width:60%; margin:6% auto">
@@ -19,3 +20,62 @@
     <a href="./login">Login</a>
   </p>
 </div>
+=======
+{{#> layout "auth"}}
+<div class="auth-container">
+  <div class="auth-card">
+    <!-- Logo -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+      </div>
+      <h1>SongRate</h1>
+      <p class="auth-subtitle">Create your account</p>
+    </div>
+
+    <!-- Error Message -->
+    {{#if error}}
+      <div class="error-message">{{error}}</div>
+    {{/if}}
+
+    <!-- Register Form -->
+    <form action="/register" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Choose a username"
+          required
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Create a strong password"
+          required
+          class="form-input"
+        />
+      </div>
+
+      <button type="submit" class="btn-primary">Create Account</button>
+    </form>
+
+    <!-- Login Link -->
+    <div class="auth-footer">
+      <p>Already have an account? <a href="/login" class="auth-link">Login here</a></p>
+    </div>
+  </div>
+</div>
+{{/layout}}
+>>>>>>> 126a8c2466c5016cabc4d57b31bb29fbbf0ca877
