@@ -81,6 +81,14 @@ app.get('/', (req, res) => {
   res.redirect('/home');
 });
 
+// Minimal My Reviews route (no API, frontend-only reviews)
+app.get('/my-reviews', (req, res) => {
+  const username = req.session && req.session.user ? req.session.user.username : 'Guest';
+  res.render('pages/my-reviews', { layout: 'main', username });
+});
+
+// Note: My Reviews page is served via the views; frontend handles review creation client-side.
+
 app.get('/welcome', (req, res) => {
   res.status(200).json({ status: 'success', message: 'Welcome!' });
 });

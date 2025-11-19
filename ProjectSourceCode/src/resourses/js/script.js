@@ -26,3 +26,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// My Reviews: toggle form and submit review
+document.addEventListener('DOMContentLoaded', function() {
+  const addBtn = document.getElementById('addReviewBtn');
+  const formContainer = document.getElementById('reviewFormContainer');
+  const cancelBtn = document.getElementById('cancelReviewBtn');
+  const reviewForm = document.getElementById('reviewForm');
+  const reviewsList = document.getElementById('reviewsList');
+  const reviewTemplate = document.getElementById('review-template');
+
+  if (addBtn && formContainer) {
+    addBtn.addEventListener('click', function() {
+      formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+      const firstInput = formContainer.querySelector('input, textarea');
+      if (firstInput) firstInput.focus();
+    });
+  }
+
+  if (cancelBtn && formContainer) {
+    cancelBtn.addEventListener('click', function() {
+      formContainer.style.display = 'none';
+      reviewForm.reset();
+    });
+  }
+
+  if (reviewForm && reviewsList && reviewTemplate) {
+    const templateSource = reviewTemplate.innerHTML;
+    const tpl = Handlebars.compile(templateSource);
+
+    reviewForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(reviewForm);
+      const songTitle = formData.get('songTitle');
+      const reviewText = formData.get('reviewText');
+
+      // Create review object locally (frontend-only)
+      const section = document.getElementById('myReviewsSection');
+      const username = section ? section.dataset.username || 'Guest' : 'Guest';
+      const createdAt = new Date().toLocaleString();
+      const usernameChar = username.charAt(0).toUpperCase();
+
+      const created = { id: Date.now(), songTitle, reviewText, username, createdAt, usernameChar };
+
+      // Render the created review and prepend to list
+      const html = tpl(created);
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      reviewsList.insertBefore(div.firstElementChild, reviewsList.firstChild);
+
+      // Reset and hide form
+      reviewForm.reset();
+      formContainer.style.display = 'none';
+    });
+  }
+});

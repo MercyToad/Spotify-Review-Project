@@ -1,0 +1,70 @@
+<section class="content-section" id="myReviewsSection" data-username="{{username}}">
+  <div class="header-row" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <div>
+      <h2>My Reviews</h2>
+      <p class="section-subtitle">Write and view your song reviews</p>
+    </div>
+    <div>
+      <button id="addReviewBtn" class="btn-primary" aria-label="Add review">+ Add Review</button>
+    </div>
+  </div>
+
+  <!-- Review form (hidden by default) -->
+  <div id="reviewFormContainer" class="review-form" style="display:none; margin-top:1rem;">
+    <form id="reviewForm">
+      <div class="form-group">
+        <label for="songTitle">Song Title</label>
+        <input id="songTitle" name="songTitle" class="form-input" placeholder="Enter song title" required />
+      </div>
+      <div class="form-group">
+        <label for="reviewText">Review</label>
+        <textarea id="reviewText" name="reviewText" class="form-input" placeholder="Write your review" rows="4" required></textarea>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <button type="submit" class="btn-primary">Add</button>
+        <button type="button" id="cancelReviewBtn" class="btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Reviews list -->
+  <div id="reviewsList" style="margin-top:1.5rem; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem;">
+    {{#if reviews}}
+      {{#each reviews}}
+        <div class="review-card-long">
+          <div class="review-card-header">
+            <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text={{usernameChar}}" alt="Avatar">
+            <div class="review-user-info">
+              <span>{{username}}</span>
+              <span class="review-timestamp">{{createdAt}}</span>
+            </div>
+            <div class="review-user-rating">&nbsp;</div>
+          </div>
+          <div class="review-card-body">
+            <p class="review-song-title">{{songTitle}}</p>
+            <p class="review-text">{{reviewText}}</p>
+          </div>
+        </div>
+      {{/each}}
+    {{/if}}
+  </div>
+
+  <!-- Client-side Handlebars template for rendering a review -->
+  <script id="review-template" type="text/x-handlebars-template">
+    <div class="review-card-long">
+      <div class="review-card-header">
+        <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text={{usernameChar}}" alt="Avatar">
+        <div class="review-user-info">
+          <span>{{username}}</span>
+          <span class="review-timestamp">{{createdAt}}</span>
+        </div>
+        <div class="review-user-rating">&nbsp;</div>
+      </div>
+      <div class="review-card-body">
+        <p class="review-song-title">{{songTitle}}</p>
+        <p class="review-text">{{reviewText}}</p>
+      </div>
+    </div>
+  </script>
+
+</section>
