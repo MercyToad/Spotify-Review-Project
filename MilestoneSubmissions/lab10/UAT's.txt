@@ -1,0 +1,83 @@
+
+
+Login and Authentication:
+Test plan: 
+    -Have the testers try to login to an already created account with their username and password.
+    -Test environment: localhost 
+    -Acceptance testers: Someone that has made an account
+
+Test Case 1: Valid login
+When the user enters valid login info (username and password), lead them to the home page
+
+Test Case 2: Invalid login due to username
+When the user inputs a username that does not exist, convey to the user that the login attempt failed 
+and that the name does not exist. Suggest them to register a new account
+
+Test Case 3: Invalid login due to password
+When the user inputs their password incorrectly, convey to the user that the login attempt failed due 
+to an invalid password and to try again.
+
+
+
+
+
+Rating System:
+Test plan:
+    -Have the testers try to sumbit a rating/review for a song that they have listened to.
+    -Test environment: localhost 
+    -Acceptance testers: Users of the app
+
+Test Case 1: Rate/review a song
+When the user wants to review a song, they will press the "create reveiw" button, which will
+pull up a form where they will be able to rate a song (from 1-5) and write a description of what they thought.
+Also make sure that they are able to see the review once they have submitted it.
+
+Test Case 2: Only rate a song (no review)
+Allow the user to only rate a song 
+
+Test Case 3: No rating (or rating out of range) of a song
+Prompt the user that they need to select a rating for the song they have selected.
+
+Test Case 4: Submission did not complete
+Convey to the user that their review was not able to be saved and to try again later.
+
+Test Case 5: Change rating
+Allow the user to update their rating of a song
+
+Verify that the rating is saved and reflected.
+Expected Result: The selected rating should be saved, and the rating value should display next to the song title.
+
+Test Case 6: Change a rating
+Objective: Ensure users can change their rating after initially rating a song.
+
+
+
+
+
+User Profile:
+Test Plan: 
+    -Have the user be able to view and edit thier profile, such as username, password, and photo
+    -Test environment: localhost 
+    -Acceptance testers: Users of the app
+
+Test Case 1: Valid username change
+When the username is available, let the user change their name to what is inputed 
+and convey that their username has changed
+
+Test Case 2: Invalid username change (already taken)
+When the user inputs a username that is already taken, convey that it is taken and 
+prompt them to try a different name
+
+Test Case 3: Valid password change
+When the user inputs a valid password change, have them log back in.
+
+Test Case 4: Invalid password change
+If the new password that they entered was not able to change, tell the user that and to try again later
+
+Test Case 5: Changing photo
+Let the user change their profile photo (whether that be preset ones or one they can upload) and
+tell them that when they do change their photo, that it was successful
+
+Test Case 6: Invalid photo change
+Same as the invalid password change, just for their photo
+

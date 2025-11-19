@@ -37,6 +37,13 @@ const dbConfig = {
 
 const db = pgp(dbConfig);
 
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
 // test your database
 db.connect()
   .then(obj => {
@@ -50,6 +57,11 @@ db.connect()
 // Middleware
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 // Initialize session variables
 app.use(
@@ -76,11 +88,60 @@ app.get('/welcome', (req, res) => {
 // Login Page
 app.get('/login', (req, res) => {
   res.render('pages/login', { layout: 'auth' });
+  // -------- Endpoints ------------- //
+
+  /* VERY IMPORTANT NOTE: I WILL MAKE THESE ENDPOINTS WORK LATER I JSUT WANTED TO GET THEM DONE SO I CAN WORK ON OTHER HW*/
+
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
+app.get('/', (req,res) => {
+    res.redirect('/login');
+})
+
+app.get('/register', (req, res) => {
+  res.render('pages/register.hbs');
+});
+
+app.post('/register', async (req, res) => {
+  if (!req.body.username || !req.body.password) {
+    return res.status(400)
+    .render('pages/register.hbs', {
+      message: "Must enter username and password",
+      error: true,
+    }); 
+  }
+  const hash = await bcrypt.hash(req.body.password, 10);
+  try {
+    var query = `INSERT INTO users (username, password) VALUES ('${req.body.username}','${hash}');`
+    await db.none(query);
+    res.status(201).json({
+      message: 'Success'
+    }); //to-do:reroute to main page
+  }
+  catch (err) {
+    console.log(err);
+    res.status(400).json({
+      error: err,
+    });
+  }
+});
+
+app.get('/login', (req, res) => {
+  res.render('pages/login.hbs');
 });
 
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
+  if (!req.body.username || !req.body.password) {
+    res.render('pages/login.hbs',{
+      message: 'Must enter username and password',
+      error: true,
+    });
+  } 
+  const {username, password} = req.body;
+  console.log(username);
+  var query = `SELECT * FROM users WHERE (username = '${username}');`
   try {
     // Query using the correct column names from create.sql
     const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
@@ -104,7 +165,20 @@ app.post('/login', async (req, res) => {
       return res.render('pages/login', {
         layout: 'auth',
         error: 'Incorrect password.'
+    var user = await db.one(query);
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (match) {
+      // req.session.user = {id: user.id, username: user.username};
+      // req.session.save();
+      // console.log("2");
+      res.redirect('/login'); //to-do: create home page and endpoints
+    }
+    else {
+      res.render('pages/login.hbs', {
+        message: 'Password is incorrect',
+        error: true,
       });
+      res.redirect('/login');
     }
   } catch (error) {
     console.error('Login error:', error);
@@ -149,6 +223,14 @@ app.post('/register', async (req, res) => {
       error: 'An error occurred during registration. Please try again.'
     });
   }
+  catch (err) {
+    console.log(err);
+    res.redirect('/register');
+    // res.status(400).json({
+    //   message: err, //user not found?
+    //   error: true,
+    // });
+  }
 });
 
 // Authentication Middleware
@@ -165,6 +247,11 @@ app.get('/home', (req, res) => {
   res.render('pages/home', {
     layout: 'main',
     username: username,
+// Home Page (protected)
+app.get('/home', auth, (req, res) => {
+  res.render('pages/home', { 
+    layout: 'main',
+    username: req.session.user.username 
   });
 });
 
@@ -179,5 +266,7 @@ app.get('/logout', (req, res) => {
 });
 
 // starting the server and keeping the connection open to listen for more requests
+// server?
+
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
