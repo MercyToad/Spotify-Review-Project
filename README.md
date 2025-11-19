@@ -11,6 +11,9 @@ Aayush Sharma,
 Zack Biehl
 
 Technology stack used in this project:
+    Frontend:   Handlebars, CSS, and JavaScript
+    Backend:    Node.js and Express
+    Database:   Postgres
 
 Prerequisites to run the application:
 

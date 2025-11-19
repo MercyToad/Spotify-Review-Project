@@ -61,10 +61,10 @@ app.use(
 );
 
 app.use(
-  express.static(path.join(__dirname, 'resourses'))
+  express.static(path.join(__dirname, 'resources'))
 );
 
-// Home route
+//Home route
 app.get('/', (req, res) => {
   res.redirect('/login');
 });
@@ -114,6 +114,7 @@ app.post('/login', async (req, res) => {
     });
   }
 });
+
 
 // Register Page GET
 app.get('/register', (req, res) => {
