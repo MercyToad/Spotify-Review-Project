@@ -34,7 +34,7 @@
 
     <!-- Profile Icon with Accordion Menu -->
     <div class="header-profile-container">
-      <div class="header-profile" id="profileBtn">
+      <div class="header-profile" id="profileBtn" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
         <!-- Inlined "User" icon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
@@ -43,18 +43,18 @@
       </div>
       
       <!-- Accordion Menu -->
-      <div class="profile-menu" id="profileMenu">
-        <a href="/profile" class="profile-menu-item">
+      <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
+        <a href="/profile" class="profile-menu-item" role="menuitem">
           <span>My Profile</span>
         </a>
-        <a href="/my-reviews" class="profile-menu-item">
+        <a href="/my-reviews" class="profile-menu-item" role="menuitem">
           <span>My Reviews</span>
         </a>
-        <a href="/settings" class="profile-menu-item">
+        <a href="/settings" class="profile-menu-item" role="menuitem">
           <span>Settings</span>
         </a>
         <hr class="profile-menu-divider" />
-        <a href="/login" class="profile-menu-item logout">
+        <a href="/login" class="profile-menu-item logout" role="menuitem">
           <span>Login</span>
         </a>
       </div>

@@ -17,38 +17,14 @@ const axios = require('axios'); // To make HTTP requests from our server. We'll 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
   extname: 'hbs',
-  layoutsDir: __dirname + '/views/layouts',
-  partialsDir: __dirname + '/views/partials',
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials'),
 });
 
-//- ****** ADDED: SERVER CONFIGURATION ****** -//
-// Register `hbs` as the view engine
+// Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Setup body-parser
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
-
-// Setup express.static to serve resources
-// We should fix the typo here ...
-app.use(express.static(path.join(__dirname, 'resourses')));
-
-// Setup session
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'supersecretkey', // CHANGE THIS!
-    saveUninitialized: false,
-    resave: false,
-  })
-);
-//- ****** END OF ADDED SERVER CONFIGURATION ****** -//
-
 
 // database configuration
 const dbConfig = {
@@ -71,20 +47,31 @@ db.connect()
     console.log('ERROR:', error.message || error);
   });
 
+// Middleware
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(bodyParser.urlencoded({ extended: true }));
 
-//- ****** ADDED: NEW ROUTES ****** -//
+// Initialize session variables
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
+
+app.use(
+  express.static(path.join(__dirname, 'resourses'))
+);
+
+// Home route — make root go to /home
 app.get('/', (req, res) => {
-  res.redirect('/home'); // Redirect root to home page
+  res.redirect('/home');
 });
 
-app.get('/home', (req, res) => {
-  res.render('pages/home'); 
+app.get('/welcome', (req, res) => {
+  res.status(200).json({ status: 'success', message: 'Welcome!' });
 });
-//- ****** END OF ADDED NEW ROUTES ****** -//
-
-
-//- ****** UNCOMMENTED FROM LAB 7 ****** -//
-// (un-commented) 
 
 // Login Page
 app.get('/login', (req, res) => {
@@ -95,95 +82,102 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]); // Searches db if the username exists
+    // Query using the correct column names from create.sql
+    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
 
     if (!user) {
-      // User not found
-      return res.status(401).render('pages/login', {
+      return res.render('pages/login', {
         layout: 'auth',
-        error: "User not found. Please register.",
+        error: 'Username not found. Please register.'
       });
     }
 
-    if (await bcrypt.compare(password, user.password)) {
-      req.session.user = { id: user.id, username: user.username };
-      // Redirect to /home instead of /discover
+    // Compare password with the password from database
+    if (await bcrypt.compare(password, user.password_hash)) {
+      req.session.user = { 
+        id: user.user_id,  // Using user_id from create.sql
+        username: user.username 
+      };
+      req.session.save();
       return res.redirect('/home');
     } else {
-      // Incorrect password
-      return res.status(401).render('pages/login', {
+      return res.render('pages/login', {
         layout: 'auth',
-        error: "Incorrect password.",
+        error: 'Incorrect password.'
       });
     }
   } catch (error) {
-    console.error(error);
-    res.render('pages/login', { layout: 'auth', error: 'An error occurred.' });
-  }
-});
-
-// Registration Page
-app.get('/register', (req, res) => {
-  res.render('pages/register', { layout: 'auth' });
-});
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const hash = await bcrypt.hash(password, 10);
-    await db.none('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
-    res.redirect('/login');
-  } catch (error) {
-    console.error('Error during registration:', error.message);
-    res.status(400).render('pages/register', { 
+    console.error('Login error:', error);
+    res.render('pages/login', {
       layout: 'auth',
-      error: 'Username already exists or another error occurred.' 
+      error: 'An error occurred during login.'
     });
   }
 });
 
-// Authentication Middleware.
+// Register Page GET
+app.get('/register', (req, res) => {
+  res.render('pages/register', { layout: 'auth' });
+});
+
+// Register Page POST
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    // Check if username already exists
+    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+    
+    if (existingUser) {
+      return res.render('pages/register', {
+        layout: 'auth',
+        error: 'Username already exists. Please choose another.'
+      });
+    }
+    //hash password
+    const hash = await bcrypt.hash(password, 10);
+    
+    // Insert new user into database
+    await db.none('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
+    
+    // Redirect to login page after successful registration
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.render('pages/register', {
+      layout: 'auth',
+      error: 'An error occurred during registration. Please try again.'
+    });
+  }
+});
+
+// Authentication Middleware
 const auth = (req, res, next) => {
   if (!req.session.user) {
-    // Default to login page.
     return res.redirect('/login');
   }
   next();
 };
 
-// Authentication Required
-// Any routes *below* this line will require a user to be logged in.
-
-// Discover Page
-const API_KEY = process.env.API_KEY;
-
-app.get('/discover', auth, async (req, res) => {
-  const keyword = 'music'; // Can be changed
-  const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${keyword}&size=12`;// change size here for more options
-
-  try {
-    const response = await axios.get(url);
-    const events = response.data._embedded?.events || [];
-    res.render('pages/discover', { results: events });
-  } catch (error) {
-    console.error('API error:', error.message);
-    res.render('pages/discover', { results: [], error: 'Could not load events.' });
-  }
+// Home Page (public). If a user is logged in we pass the username, otherwise render public home.
+app.get('/home', (req, res) => {
+  const username = req.session && req.session.user ? req.session.user.username : null;
+  res.render('pages/home', {
+    layout: 'main',
+    username: username,
+  });
 });
 
-// Logout Page
+// Logout
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).send('Could not log out.');
     }
-    // Render a logout page, or just redirect to login
     res.redirect('/login');
   });
 });
-//- ****** END OF UNCOMMENTED BLOCK ****** -//
-
 
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
