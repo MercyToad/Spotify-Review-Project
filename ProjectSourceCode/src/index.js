@@ -177,6 +177,149 @@ app.get('/logout', (req, res) => {
   });
 });
 
+// ============================
+// REVIEW ROUTES
+// ============================
+
+// View all reviews for a target
+app.get('/reviews/:target_type/:target_id', auth, async (req, res) => {
+  const { target_type, target_id } = req.params;
+  
+  try {
+    const reviews = await db.any(
+      `SELECT r.*, u.username 
+       FROM review r 
+       JOIN users u ON r.user_id = u.user_id 
+       WHERE r.target_type = $1 AND r.target_id = $2 
+       ORDER BY r.created_at DESC`,
+      [target_type, target_id]
+    );
+    
+    res.render('pages/reviews', { reviews, target_type, target_id });
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).send('Error loading reviews');
+  }
+});
+
+// Create review form
+app.get('/review/create/:target_type/:target_id', auth, (req, res) => {
+  const { target_type, target_id } = req.params;
+  res.render('pages/create_review', { target_type, target_id });
+});
+
+// Submit new review
+app.post('/review/create', auth, async (req, res) => {
+  const { target_type, target_id, title, review_text, rating } = req.body;
+  const user_id = req.session.user.id;
+  
+  try {
+    await db.none(
+      `INSERT INTO review (user_id, target_type, target_id, title, review_text, rating) 
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [user_id, target_type, target_id, title, review_text, rating]
+    );
+    res.redirect(`/reviews/${target_type}/${target_id}`);
+  } catch (error) {
+    console.error('Error creating review:', error);
+    res.render('pages/create_review', {
+      target_type, target_id,
+      error: 'Failed to create review. You may have already reviewed this item.'
+    });
+  }
+});
+
+// Edit review form
+app.get('/review/edit/:review_id', auth, async (req, res) => {
+  const { review_id } = req.params;
+  const user_id = req.session.user.id;
+  
+  try {
+    const review = await db.oneOrNone(
+      'SELECT * FROM review WHERE review_id = $1 AND user_id = $2',
+      [review_id, user_id]
+    );
+    
+    if (!review) {
+      return res.status(404).send('Review not found');
+    }
+    
+    res.render('pages/edit_review', { review });
+  } catch (error) {
+    console.error('Error loading review:', error);
+    res.status(500).send('Error loading review');
+  }
+});
+
+// Update review
+app.post('/review/edit/:review_id', auth, async (req, res) => {
+  const { review_id } = req.params;
+  const { title, review_text, rating } = req.body;
+  const user_id = req.session.user.id;
+  
+  try {
+    const result = await db.result(
+      `UPDATE review 
+       SET title = $1, review_text = $2, rating = $3, updated_at = NOW() 
+       WHERE review_id = $4 AND user_id = $5`,
+      [title, review_text, rating, review_id, user_id]
+    );
+    
+    if (result.rowCount === 0) {
+      return res.status(404).send('Review not found');
+    }
+    
+    const review = await db.one('SELECT target_type, target_id FROM review WHERE review_id = $1', [review_id]);
+    res.redirect(`/reviews/${review.target_type}/${review.target_id}`);
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(500).send('Error updating review');
+  }
+});
+
+// Delete review
+app.post('/review/delete/:review_id', auth, async (req, res) => {
+  const { review_id } = req.params;
+  const user_id = req.session.user.id;
+  
+  try {
+    const review = await db.oneOrNone(
+      'SELECT target_type, target_id FROM review WHERE review_id = $1 AND user_id = $2',
+      [review_id, user_id]
+    );
+    
+    if (!review) {
+      return res.status(404).send('Review not found');
+    }
+    
+    await db.none('DELETE FROM review WHERE review_id = $1 AND user_id = $2', [review_id, user_id]);
+    res.redirect(`/reviews/${review.target_type}/${review.target_id}`);
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    res.status(500).send('Error deleting review');
+  }
+});
+
+// View user's own reviews
+app.get('/my-reviews', auth, async (req, res) => {
+  const user_id = req.session.user.id;
+  
+  try {
+    const reviews = await db.any(
+      `SELECT * FROM review 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC`,
+      [user_id]
+    );
+    
+    res.render('pages/my_reviews', { reviews });
+  } catch (error) {
+    console.error('Error fetching user reviews:', error);
+    res.status(500).send('Error loading your reviews');
+  }
+});
+
+
 // starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
