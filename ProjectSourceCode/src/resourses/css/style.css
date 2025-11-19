@@ -1,20 +1,20 @@
 /* --- Global & Spotify Variables --- */
 :root {
-   
-    --spotify-green: #1DB954; /* Keeping this classic green */
-    --background: oklch(0.145 0 0);        /* from --background */
-    --foreground: oklch(0.985 0 0);        /* from --foreground */
-    --card-background: oklch(0.145 0 0); /* from --card */
-    --muted-background: oklch(0.269 0 0);  /* from --muted / --accent */
-    --muted-foreground: oklch(0.708 0 0);  /* from --muted-foreground */
-    --border-color: oklch(0.269 0 0);      /* from --border */
-    --radius: 0.625rem; /* from --radius (10px) */
-  
-    /* Fonts  */
-    --font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
-    --font-weight-medium: 500;
-    --font-weight-normal: 400;
-  }
+  --spotify-green: #1DB954; /* classic green */
+  /* Use hex fallbacks for broader browser support */
+  --background: #0f1112;           /* dark page background */
+  --foreground: #ffffff;           /* main text */
+  --card-background: #121212;      /* card background */
+  --muted-background: #232526;     /* muted/accent background */
+  --muted-foreground: #9aa0a6;     /* muted text */
+  --border-color: #2b2b2b;         /* border color */
+  --radius: 0.625rem;              /* 10px */
+
+  /* Fonts */
+  --font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+}
   
   /* --- General Page Setup --- */
   body {

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 -- ============================
 -- USERS
@@ -81,7 +80,6 @@ CREATE TABLE review (
 );
 
 CREATE INDEX idx_review_target ON review(target_type, target_id);
-=======
 -- Stores basic user info (can come from Spotify’s OAuth later)
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -113,4 +111,3 @@ CREATE TABLE IF NOT EXISTS reviews (
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
->>>>>>> lab10

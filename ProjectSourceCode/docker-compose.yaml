@@ -20,10 +20,6 @@ services:
       - '3000:3000'
     volumes:
       - ./:/repository 
-<<<<<<< HEAD
-    command: 'npm start' #nmp run testandrun
-=======
-    command: 'npm run testandrun'
->>>>>>> lab10
+    command: 'npm start'
 volumes:
   group-project:
