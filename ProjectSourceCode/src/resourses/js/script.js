@@ -172,4 +172,123 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
+    // ------------------------------
+    // FRONTEND-ONLY MOCK AUTH (no backend changes)
+    // - Stores a mock user in localStorage and updates header/menu on the client
+    // - Useful for frontend development when backend auth is not available
+    // ------------------------------
+    const MOCK_AUTH_KEY = 'mock_authenticated_user';
+
+    function applyMockLoggedInState(username) {
+      const container = document.querySelector('.header-profile-container');
+      if (!container) return;
+
+      // remove any existing greeting
+      const existingGreeting = container.querySelector('.mock-greeting');
+      if (existingGreeting) existingGreeting.remove();
+
+      // insert greeting
+      const span = document.createElement('div');
+      span.className = 'mock-greeting';
+      span.style.color = 'var(--muted-foreground)';
+      span.style.fontSize = '0.95rem';
+      span.style.marginRight = '0.6rem';
+      span.innerHTML = `Welcome <strong style="color:var(--foreground);">${username}</strong>`;
+      container.insertBefore(span, container.firstChild);
+
+      // update profile menu items to show logout
+      const menu = document.getElementById('profileMenu');
+      if (menu) {
+        menu.innerHTML = `
+          <a href="/profile" class="profile-menu-item" role="menuitem"><span>Mi perfil</span></a>
+          <a href="/my-reviews" class="profile-menu-item" role="menuitem"><span>Mis reseñas</span></a>
+          <a href="/settings" class="profile-menu-item" role="menuitem"><span>Configuración</span></a>
+          <hr class="profile-menu-divider" />
+          <button id="mockLogout" class="profile-menu-item logout" role="menuitem"><span>Logout</span></button>
+        `;
+
+        // rebind click to close menu on items
+        const items = menu.querySelectorAll('.profile-menu-item');
+        items.forEach(item => item.addEventListener('click', function() {
+          menu.classList.remove('active');
+          const btn = document.getElementById('profileBtn');
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+          menu.setAttribute('aria-hidden', 'true');
+        }));
+
+        // bind logout
+        const logoutBtn = document.getElementById('mockLogout');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem(MOCK_AUTH_KEY);
+            // reload to simulate server-side logout
+            window.location.href = '/home';
+          });
+        }
+      }
+    }
+
+    function clearMockLoggedInState() {
+      const existingGreeting = document.querySelector('.mock-greeting');
+      if (existingGreeting) existingGreeting.remove();
+      const menu = document.getElementById('profileMenu');
+      if (!menu) return;
+      // restore original login button if present in template
+      const hasLoginButton = menu.querySelector('#openAuthModal');
+      if (!hasLoginButton) {
+        // crude restore: replace last item with login button
+        menu.innerHTML = menu.innerHTML + '<hr class="profile-menu-divider" /><button type="button" id="openAuthModal" class="profile-menu-item logout" role="menuitem"><span>Login</span></button>';
+        const openBtn = document.getElementById('openAuthModal');
+        if (openBtn) openBtn.addEventListener('click', function(e){ e.preventDefault(); showAuthModal('login'); });
+      }
+    }
+
+    // If a mock user is stored, apply logged-in state on load
+    const storedMock = localStorage.getItem(MOCK_AUTH_KEY);
+    if (storedMock) {
+      try {
+        const parsed = JSON.parse(storedMock);
+        if (parsed && parsed.username) applyMockLoggedInState(parsed.username);
+      } catch (e) {
+        // ignore parse errors
+      }
+    }
+
+    // Intercept modal forms and perform frontend-only auth (mock)
+    const modalLoginForm = loginView ? loginView.querySelector('form') : null;
+    const modalRegisterForm = registerView ? registerView.querySelector('form') : null;
+
+    function handleMockAuthSubmit(formEl) {
+      if (!formEl) return;
+      const fd = new FormData(formEl);
+      const uname = fd.get('username') || fd.get('login-username') || '';
+      if (!uname || uname.trim().length < 1) {
+        // show a small inline error
+        let err = formEl.querySelector('.auth-error');
+        if (!err) { err = document.createElement('div'); err.className = 'auth-error error-message'; formEl.insertBefore(err, formEl.firstChild); }
+        err.textContent = 'Please provide a username.';
+        return;
+      }
+      // store mock user
+      localStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ username: uname.trim() }));
+      // apply and redirect to /home to simulate private home
+      applyMockLoggedInState(uname.trim());
+      hideAuthModal();
+      window.location.href = '/home';
+    }
+
+    if (modalLoginForm) {
+      modalLoginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleMockAuthSubmit(modalLoginForm);
+      });
+    }
+    if (modalRegisterForm) {
+      modalRegisterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleMockAuthSubmit(modalRegisterForm);
+      });
+    }
+
   });
