@@ -97,4 +97,79 @@ document.addEventListener('DOMContentLoaded', function() {
       formContainer.style.display = 'none';
     });
   }
-});
+
+    // ------------------------------
+    // Auth modal: open, close, switch views
+    // ------------------------------
+    const openAuthBtn = document.getElementById('openAuthModal');
+    const authOverlay = document.getElementById('authModalOverlay');
+    const closeAuthBtn = document.getElementById('closeAuthModal');
+    const loginView = document.getElementById('authLoginView');
+    const registerView = document.getElementById('authRegisterView');
+    const toRegisterLink = document.getElementById('toRegisterLink');
+    const toLoginLink = document.getElementById('toLoginLink');
+
+    function showAuthModal(view = 'login') {
+      if (!authOverlay) return;
+      document.body.style.overflow = 'hidden';
+      authOverlay.classList.add('active');
+      authOverlay.setAttribute('aria-hidden', 'false');
+      if (view === 'register') {
+        if (loginView) loginView.hidden = true;
+        if (registerView) registerView.hidden = false;
+      } else {
+        if (loginView) loginView.hidden = false;
+        if (registerView) registerView.hidden = true;
+      }
+      // focus first input
+      const first = authOverlay.querySelector('input');
+      if (first) first.focus();
+    }
+
+    function hideAuthModal() {
+      if (!authOverlay) return;
+      authOverlay.classList.remove('active');
+      authOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    if (openAuthBtn) {
+      openAuthBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        showAuthModal('login');
+      });
+    }
+
+    if (closeAuthBtn) {
+      closeAuthBtn.addEventListener('click', function() {
+        hideAuthModal();
+      });
+    }
+
+    if (authOverlay) {
+      // clicking on overlay (outside modal) closes it
+      authOverlay.addEventListener('click', function(e) {
+        if (e.target === authOverlay) hideAuthModal();
+      });
+
+      // ESC key closes modal
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') hideAuthModal();
+      });
+    }
+
+    if (toRegisterLink) {
+      toRegisterLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showAuthModal('register');
+      });
+    }
+
+    if (toLoginLink) {
+      toLoginLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showAuthModal('login');
+      });
+    }
+
+  });

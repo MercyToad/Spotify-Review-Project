@@ -225,16 +225,22 @@
     transform: translateY(0);
   }
   
-  .profile-menu-item {
-    display: block;
+  .profile-menu-item,
+  .profile-menu button.profile-menu-item,
+  .profile-menu a.profile-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
     padding: 0.75rem 1rem;
     color: var(--foreground);
     text-decoration: none;
     border: none;
     background: none;
+    box-sizing: border-box;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
     font-size: 0.875rem;
+    text-align: left;
   }
   
   .profile-menu-item:hover {
@@ -789,4 +795,89 @@
 
   .review-song-title {
     font-weight:600;color:var(--foreground);margin-bottom:0.25rem;
+  }
+
+  /* --- HomePage Modal Styles --- */
+  .auth-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2,6,23,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1.5rem;
+  }
+
+  .auth-modal-overlay.active {
+    display: flex;
+  }
+
+  .auth-modal {
+    width: 100%;
+    max-width: 460px;
+    background-color: var(--panel);
+    border-radius: calc(var(--radius) + 2px);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+    border: 1px solid var(--border-color);
+    position: relative;
+    transform: translateY(-12px);
+    opacity: 0;
+    transition: transform 220ms var(--transition-fast), opacity 180ms ease;
+    overflow: hidden;
+  }
+
+  .auth-modal-overlay.active .auth-modal {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .auth-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--muted-foreground);
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .auth-body {
+    padding: 0.85rem 1rem 1.5rem 1rem;
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .auth-logo {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+  }
+
+  .auth-modal .auth-header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0.25rem 0 0.5rem 0;
+  }
+
+  .auth-view { display: block; }
+
+  .auth-form { margin-top: 0.25rem; }
+
+  .auth-modal .form-group { margin-bottom: 0.85rem; }
+
+  .auth-modal .auth-footer { text-align: center; margin-top: 0.75rem; }
+
+  @media (max-width: 520px) {
+    .auth-modal { max-width: 100%; height: auto; margin: 0 0.5rem; }
   }
