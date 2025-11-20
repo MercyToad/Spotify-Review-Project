@@ -1,6 +1,12 @@
+{{!--
+  Header partial
+  - Contains: logo, main navigation links, search input, and user profile menu.
+  - Included in `main.hbs` layout via `{{> header}}`.
+--}}
 <header class="site-header">
   <div class="header-container">
     
+    {{!-- Logo and title (left) --}}
     <!-- Logo and Title -->
     <a href="/home" class="header-logo">
       <div class="logo-icon">
@@ -14,6 +20,7 @@
       <span class="logo-text">SongRate</span>
     </a>
 
+    {{!-- Top navigation links (center) --}}
     <!-- Navigation Links -->
     <nav class="site-nav">
       <a href="/home">Home</a>
@@ -22,6 +29,7 @@
       <a href="/profile">Profile</a>
     </nav>
 
+    {{!-- Search input (middle) --}}
     <!-- Search Bar -->
     <div class="header-search">
       <!-- Inlined "Search" icon -->
@@ -32,6 +40,7 @@
       <input type="text" placeholder="Search songs, artists, albums..." class="search-input" />
     </div>
 
+    {{!-- Profile icon and dropdown menu (right) --}}
     <!-- Profile Icon with Accordion Menu -->
     <div class="header-profile-container">
       <div class="header-profile" id="profileBtn" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
@@ -43,6 +52,7 @@
       </div>
       
       <!-- Accordion Menu -->
+      {{!-- Dropdown menu for quick links (My Profile, My Reviews, Settings, Login) --}}
       <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
         <a href="/profile" class="profile-menu-item" role="menuitem">
           <span>My Profile</span>
