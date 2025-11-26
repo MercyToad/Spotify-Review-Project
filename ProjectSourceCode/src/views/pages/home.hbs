@@ -16,48 +16,9 @@
       <h2>Recommended for You</h2>
       <p class="section-subtitle">Based on your listening history</p>
       <div class="content-grid three-col">
-        <!-- Card 1 -->
-        <article class="song-card glass-card">
-          <div class="cover-placeholder">
-            <img src="https://placehold.co/300x300/c026d3/white?text=Album+Art" alt="Album Art">
-          </div>
-          <div>
-            <h3 class="song-title">Blinding Lights</h3>
-            <p class="meta-muted">The Weeknd</p>
-          </div>
-          <div class="card-footer">
-            <span class="rating-badge">★ 4.5</span>
-            <span class="review-count muted-small">234 reviews</span>
-          </div>
-        </article>
-        <!-- Card 2 -->
-        <article class="song-card glass-card">
-          <div class="cover-placeholder">
-            <img src="https://placehold.co/300x300/c026d3/white?text=Album+Art" alt="Album Art">
-          </div>
-          <div>
-            <h3 class="song-title">Levitating</h3>
-            <p class="meta-muted">Dua Lipa</p>
-          </div>
-          <div class="card-footer">
-            <span class="rating-badge">★ 4.7</span>
-            <span class="review-count muted-small">189 reviews</span>
-          </div>
-        </article>
-        <!-- Card 3 -->
-        <article class="song-card glass-card">
-          <div class="cover-placeholder">
-            <img src="https://placehold.co/300x300/c026d3/white?text=Album+Art" alt="Album Art">
-          </div>
-          <div>
-            <h3 class="song-title">Save Your Tears</h3>
-            <p class="meta-muted">The Weeknd</p>
-          </div>
-          <div class="card-footer">
-            <span class="rating-badge">★ 4.3</span>
-            <span class="review-count muted-small">158 reviews</span>
-          </div>
-        </article>
+        {{#each songs}}
+          {{> song-card}}
+        {{/each}}
       </div>
     </section>
 

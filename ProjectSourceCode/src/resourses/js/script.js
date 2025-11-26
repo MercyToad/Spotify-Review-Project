@@ -227,6 +227,8 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
       }
+
+      // need to get highly rated songs from user
     }
 
     function clearMockLoggedInState() {
@@ -242,6 +244,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const openBtn = document.getElementById('openAuthModal');
         if (openBtn) openBtn.addEventListener('click', function(e){ e.preventDefault(); showAuthModal('login'); });
       }
+
+      const songCards = document.querySelectorAll('.my-class');
     }
 
     // If a mock user is stored, apply logged-in state on load

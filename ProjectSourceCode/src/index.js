@@ -72,6 +72,10 @@ app.use(
   })
 );
 
+const bearer_token = `Bearer ${process.env.API_KEY}`;
+
+
+
 app.use(
   express.static(path.join(__dirname, 'resourses'))
 );
@@ -186,22 +190,73 @@ const auth = (req, res, next) => {
 };
 
 // Home Page. If a user is logged in we pass the username, otherwise render public home.
-app.get('/home', (req, res) => {
+app.get('/home', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : null;
+  let songs;
+  // if (!username) {
+    const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', { //hard coded top 50 playlist cuz i cant access official spotify one. unsure if this will ever change
+    method: 'GET',
+    headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': bearer_token,
+    },
+    });
+    const data = await response.json();
+    songs = data.items;
+  // }
+  // else {
+
+  // }
   return res.render('pages/home', {
     layout: 'main',
     username: username,
+    songs: songs,
   });
 });
 
 // Logout
-app.get('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).send('Could not log out.');
     }
     res.redirect('/login');
   });
+});
+
+app.get('/searchResults', async (req, res) => {
+  const query = req.query.song_name;
+  const params = new URLSearchParams({
+    'q': query,
+    'type': 'track',
+    'limit': 5,
+  });
+  console.log(params);
+  const response = fetch(`https://api.spotify.com/v1/search?${params}`, {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': bearer_token,
+  },
+  // body: JSON.stringify(postData),
+});
+// .then(response => response.json())
+// .then(data => console.log(data))
+// .catch(error => console.error('Error:', error))
+// .return
+
+
+  // try {
+  //   const response = await fetch(url);
+  //   if (!response.ok) {
+  //     throw new Error(`Network response was not ok: ${response.status}`);
+  //   }
+
+  //   // 3. Parse the response body as JSON
+  //   const data = await response.json();
+
+  //   // 4. Use the data
+  //   console.log(data);
 });
 
 // starting the server and keeping the connection open to listen for more requests
