@@ -200,9 +200,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const menu = document.getElementById('profileMenu');
       if (menu) {
         menu.innerHTML = `
-          <a href="/profile" class="profile-menu-item" role="menuitem"><span>Mi perfil</span></a>
-          <a href="/my-reviews" class="profile-menu-item" role="menuitem"><span>Mis reseñas</span></a>
-          <a href="/settings" class="profile-menu-item" role="menuitem"><span>Configuración</span></a>
+          <a href="/profile" class="profile-menu-item" role="menuitem"><span>Profile</span></a>
+          <a href="/my-reviews" class="profile-menu-item" role="menuitem"><span>My Reviews</span></a>
+          <a href="/settings" class="profile-menu-item" role="menuitem"><span>Settings</span></a>
           <hr class="profile-menu-divider" />
           <button id="mockLogout" class="profile-menu-item logout" role="menuitem"><span>Logout</span></button>
         `;
