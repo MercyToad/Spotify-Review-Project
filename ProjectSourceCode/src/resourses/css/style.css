@@ -42,15 +42,6 @@
     box-sizing: border-box;
   }
   
-  h1, h2, h3, p {
-    margin: 0;
-    padding: 0;
-  }
-  
-  h1, h2, h3 {
-    font-weight: var(--font-weight-medium);
-  }
-  
   a {
     color: var(--foreground);
     text-decoration: none;
@@ -90,7 +81,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    text-decoration: none;
   }
   
   .logo-icon {
@@ -104,12 +94,6 @@
     color: white;
   }
   
-  .logo-text {
-    color: var(--foreground);
-    letter-spacing: -0.025em;
-    font-weight: 600;
-  }
-
   /* Smooth font rendering and improved contrast for headings */
   body, input, button, textarea {
     -webkit-font-smoothing: antialiased;
@@ -162,11 +146,7 @@
     box-sizing: border-box;
     transition: border-color 0.2s ease;
   }
-  
-  .search-input::placeholder {
-    color: var(--muted-foreground);
-  }
-  
+    
   .search-input:focus {
     outline: none;
     border-color: var(--spotify-green);
@@ -184,10 +164,6 @@
     color: white;
     cursor: pointer;
     transition: transform 0.2s ease;
-  }
-  
-  .header-profile:hover {
-    transform: scale(1.05);
   }
   
   /* Profile Container & Accordion Menu */
@@ -316,14 +292,6 @@
     display: grid;
     grid-template-columns: 1fr; /* Default to 1 column on mobile */
     gap: 2rem;
-  }
-  
-  .main-content {
-    grid-column: span 1;
-  }
-  
-  .sidebar-content {
-    grid-column: span 1;
   }
   
   /* Desktop Layout (for screens > 1024px) */
