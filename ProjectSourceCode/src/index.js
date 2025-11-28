@@ -214,6 +214,16 @@ app.get('/home', async (req, res) => {
   });
 });
 
+// Discover Page
+app.get('/discover', (req, res) => {
+  res.render('pages/discover');
+});
+
+// Settings Page
+app.get('/settings', (req, res) => {
+  res.render('pages/settings');
+});
+
 // Logout
 app.get('/logout', async (req, res) => {
   req.session.destroy((err) => {

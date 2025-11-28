@@ -1,0 +1,266 @@
+{{!--
+  Settings Page
+  - Handles Profile, Email, and Password updates
+  - Includes specific modals and feedback alerts
+--}}
+
+<style>
+  /* Page-Specific Styles to avoid touching style.css */
+  .settings-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* Alert Boxes */
+  .alert-box {
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  .alert-success {
+    background: rgba(29, 185, 84, 0.15);
+    border: 1px solid var(--spotify-green);
+    color: var(--spotify-green);
+  }
+  .alert-error {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #ef4444;
+  }
+
+  /* Pencil Button */
+  .edit-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--muted-foreground);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .edit-btn:hover {
+    color: var(--foreground);
+    border-color: var(--foreground);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Avatar Edit Overlay */
+  .avatar-container {
+    position: relative;
+    cursor: pointer;
+  }
+  .avatar-edit-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .avatar-container:hover .avatar-edit-overlay {
+    opacity: 1;
+  }
+</style>
+
+<div class="discover-container">
+  <div class="settings-wrapper">
+    
+    <!-- 1. Feedback Alerts (Rendered if server passes these flags) -->
+    {{#if email_confirmed}}
+      <div class="alert-box alert-success">Email change confirmed</div>
+    {{/if}}
+    {{#if password_confirmed}}
+      <div class="alert-box alert-success">Password change confirmed</div>
+    {{/if}}
+    {{#if not_confirmed}}
+      <div class="alert-box alert-error">Not confirmed: {{error_msg}}</div>
+    {{/if}}
+
+    <section class="content-section">
+      <h2>Account Settings</h2>
+      <p class="section-subtitle">Manage your profile and security preferences.</p>
+    </section>
+
+    <!-- 2. Profile Section -->
+    <section class="content-card" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+      <!-- Editable Avatar -->
+      <div class="avatar-container" onclick="openModal('profileModal')">
+        <img src="https://placehold.co/100x100/1DB954/white?text={{#if username}}{{username}}{{else}}U{{/if}}" 
+             alt="Avatar" 
+             style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+        <div class="avatar-edit-overlay">
+           <!-- Pencil Icon -->
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        </div>
+      </div>
+      
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+          <!-- Editable Username -->
+          <h3 style="font-size: 1.5rem; margin: 0;">{{#if username}}{{username}}{{else}}user1234{{/if}}</h3>
+          <button class="edit-btn" style="width: 28px; height: 28px;" onclick="openModal('profileModal')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+           <p style="color: var(--muted-foreground); font-size: 0.9rem;">Spotify: <span style="color: var(--spotify-green);">{{#if spotify_id}}{{spotify_id}}{{else}}Not Connected{{/if}}</span></p>
+           <button onclick="alert('Redirecting to Spotify Auth...')" style="background: transparent; border: 1px solid var(--border-color); color: var(--foreground); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; cursor: pointer;">Connect New Account</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Contact Info (Email) -->
+    <section class="content-card" style="margin-bottom: 2rem;">
+      <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Contact Info</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+        <div>
+          <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 0.25rem;">Email</p>
+          <p style="font-size: 1rem; color: var(--foreground);">{{#if email}}{{email}}{{else}}user@example.com{{/if}}</p>
+        </div>
+        <button class="edit-btn" onclick="openModal('emailModal')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. Security (Password) -->
+    <section class="content-card" style="margin-bottom: 2rem;">
+      <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Security</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+        <div>
+          <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 0.25rem;">Password</p>
+          <p style="font-size: 1rem; color: var(--foreground); letter-spacing: 3px; font-family: monospace;">********</p>
+        </div>
+        <button class="edit-btn" onclick="openModal('passwordModal')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        </button>
+      </div>
+    </section>
+    
+    <!-- 5. Delete Account (Danger Zone) -->
+    <section class="content-card" style="border-color: rgba(220, 38, 38, 0.3);">
+      <h3 style="margin-bottom: 1rem; color: #ef4444;">Danger Zone</h3>
+      <p style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--muted-foreground);">Once you delete your account, there is no going back. Please be certain.</p>
+      <form action="/delete-account" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
+        <button type="submit" class="btn-primary" style="width: auto; background-color: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid #ef4444;">Delete Account</button>
+      </form>
+    </section>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- 1. Profile Edit Modal -->
+<div id="profileModal" class="auth-modal-overlay">
+  <div class="auth-modal" role="dialog">
+    <button onclick="closeModal('profileModal')" class="auth-close">×</button>
+    <div class="auth-body">
+      <div class="auth-header">
+        <h2>Edit Profile</h2>
+      </div>
+      <form action="/update-profile" method="POST" class="auth-form">
+        <div class="form-group">
+           <label>Username</label>
+           <input type="text" name="username" class="form-input" value="{{#if username}}{{username}}{{else}}user1234{{/if}}" required>
+        </div>
+        <div class="form-group">
+           <label>Profile Picture URL</label>
+           <input type="text" name="pfpUrl" class="form-input" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="auth-footer">
+           <button type="submit" class="btn-primary">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Email Modal -->
+<div id="emailModal" class="auth-modal-overlay">
+  <div class="auth-modal" role="dialog">
+    <button onclick="closeModal('emailModal')" class="auth-close">×</button>
+    <div class="auth-body">
+      <div class="auth-header">
+        <h2>Update Email</h2>
+      </div>
+      <form action="/update-email" method="POST" class="auth-form">
+        <div class="form-group">
+           <label>Original Email</label>
+           <input type="email" name="originalEmail" class="form-input" placeholder="Confirm current email" required>
+        </div>
+        <div class="form-group">
+           <label>New Email</label>
+           <input type="email" name="newEmail" class="form-input" placeholder="Enter new email" required>
+        </div>
+        <div class="auth-footer">
+           <button type="submit" class="btn-primary">Update Email</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Password Modal -->
+<div id="passwordModal" class="auth-modal-overlay">
+  <div class="auth-modal" role="dialog">
+    <button onclick="closeModal('passwordModal')" class="auth-close">×</button>
+    <div class="auth-body">
+      <div class="auth-header">
+        <h2>Change Password</h2>
+      </div>
+      <form action="/update-password" method="POST" class="auth-form">
+        <div class="form-group">
+           <label>Original Password</label>
+           <input type="password" name="originalPassword" class="form-input" placeholder="Enter current password" required>
+        </div>
+        <div class="form-group">
+           <label>New Password</label>
+           <input type="password" name="newPassword" class="form-input" placeholder="Enter new password" required>
+        </div>
+        <div class="form-group">
+           <label>Confirm New Password</label>
+           <input type="password" name="confirmNewPassword" class="form-input" placeholder="Re-enter new password" required>
+        </div>
+        <div class="auth-footer">
+           <button type="submit" class="btn-primary">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(id) {
+    const modal = document.getElementById(id);
+    if(modal) {
+       modal.classList.add('active');
+       modal.style.display = 'flex';
+    }
+  }
+  
+  function closeModal(id) {
+    const modal = document.getElementById(id);
+    if(modal) {
+       modal.classList.remove('active');
+       modal.style.display = 'none';
+    }
+  }
+  
+  // Close on click outside
+  window.onclick = function(e) {
+    if (e.target.classList.contains('auth-modal-overlay')) {
+      e.target.classList.remove('active');
+      e.target.style.display = 'none';
+    }
+  }
+</script>
