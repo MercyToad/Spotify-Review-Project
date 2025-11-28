@@ -12,6 +12,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const profileBtn = document.getElementById('profileBtn');
   const profileMenu = document.getElementById('profileMenu');
 
+  // If we're on the public homepage, force navbar/profile links to point to root
+  if (window.location.pathname === '/') {
+    // site nav links should not navigate away — keep users on public homepage
+    const navLinks = document.querySelectorAll('.site-nav a');
+    navLinks.forEach(a => { a.setAttribute('href', '/'); });
+
+    // header logo: point to root
+    const logoLink = document.querySelector('.header-logo');
+    if (logoLink) logoLink.setAttribute('href', '/');
+
+    // profile-menu anchors should also point to root (public behaviour)
+    const profileAnchors = document.querySelectorAll('.profile-menu a');
+    profileAnchors.forEach(a => { a.setAttribute('href', '/'); });
+  }
+
   if (profileBtn && profileMenu) {
     // Toggle menu when clicking the profile button
     profileBtn.addEventListener('click', function(e) {
@@ -140,6 +155,18 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
+    // Bind any CTA elements that should open the auth modal (public hero uses this)
+    const openAuthCTAs = document.querySelectorAll('.open-auth-cta');
+    if (openAuthCTAs && openAuthCTAs.length) {
+      openAuthCTAs.forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          const view = el.dataset.authView || el.getAttribute('data-auth-view') || 'register';
+          showAuthModal(view);
+        });
+      });
+    }
+
     if (closeAuthBtn) {
       closeAuthBtn.addEventListener('click', function() {
         hideAuthModal();
@@ -222,8 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
           logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem(MOCK_AUTH_KEY);
-            // reload to simulate server-side logout
-            window.location.href = '/home';
+            // reload to simulate server-side logout — go to public landing page
+            window.location.href = '/';
           });
         }
       }
