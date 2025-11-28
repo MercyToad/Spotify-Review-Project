@@ -80,9 +80,10 @@ app.use(
   express.static(path.join(__dirname, 'resourses'))
 );
 
-// Home route — make root go to /home
+// Root route — serve public landing page
 app.get('/', (req, res) => {
-  res.redirect('/home');
+  const username = req.session && req.session.user ? req.session.user.username : null;
+  return res.render('pages/public', { layout: 'main', username });
 });
 
 // Minimal My Reviews route (no API, frontend-only reviews)
@@ -221,7 +222,8 @@ app.get('/logout', async (req, res) => {
     if (err) {
       return res.status(500).send('Could not log out.');
     }
-    res.redirect('/login');
+    // After logout, send user to the public landing page
+    res.redirect('/');
   });
 });
 
