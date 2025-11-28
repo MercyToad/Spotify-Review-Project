@@ -203,6 +203,7 @@ app.get('/home', async (req, res) => {
     });
     const data = await response.json();
     songs = data.items;
+    console.log(songs);
   // }
   // else {
 
