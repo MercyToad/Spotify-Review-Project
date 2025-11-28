@@ -21,4 +21,4 @@ How to run app locally:
 
 How to run tests:
 
-Link to the deployed application:
+Link to the deployed application: https://spotify-review-project.onrender.com/home
