@@ -1,18 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spotify Rater</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-  {{> header}}
-  {{{body}}}
-  {{> footer}}
-  <script src="/js/script.js"></script>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>SongRate</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="/css/style.css">
+	</head>
+	<body class="d-flex flex-column min-vh-100">
+		{{> header}}
+
+		<main class="flex-fill">
+			{{{body}}}
+		</main>
+
+		{{> footer}}
+
+		<!-- Authentication Modal (global) -->
+		<div id="authModalOverlay" class="auth-modal-overlay" aria-hidden="true">
+		  <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+		    <button id="closeAuthModal" class="auth-close" aria-label="Close authentication dialog">×</button>
+		    <div class="auth-body">
+		      <!-- Login View -->
+		      <div id="authLoginView" class="auth-view">
+				<div class="auth-header">
+					<div class="auth-logo" aria-hidden="true">
+						<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M9 18V5l12-2v13"></path>
+							<circle cx="6" cy="18" r="3"></circle>
+							<circle cx="18" cy="16" r="3"></circle>
+						</svg>
+					</div>
+					<h1 id="authTitle">Log in to SongRate</h1>
+				</div>
+		        <form class="auth-form" action="/login" method="POST">
+		          <div class="form-group">
+		            <label for="login-username">Username or Email</label>
+		            <input id="login-username" name="username" class="form-input" type="text" required />
+		          </div>
+		          <div class="form-group">
+		            <label for="login-password">Password</label>
+		            <input id="login-password" name="password" class="form-input" type="password" required />
+		          </div>
+		          <button type="submit" class="btn-primary">Log In</button>
+		        </form>
+		        <div class="auth-footer">
+		          <p>Don't have an account? <a href="#" id="toRegisterLink" class="auth-link">Create an account</a></p>
+		        </div>
+		      </div>
+
+		      <!-- Register View -->
+		      <div id="authRegisterView" class="auth-view" hidden>
+				<div class="auth-header">
+					<div class="auth-logo" aria-hidden="true">
+						<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M9 18V5l12-2v13"></path>
+							<circle cx="6" cy="18" r="3"></circle>
+							<circle cx="18" cy="16" r="3"></circle>
+						</svg>
+					</div>
+					<h1>Create an account</h1>
+				</div>
+		        <form class="auth-form" action="/register" method="POST">
+		          <div class="form-group">
+		            <label for="reg-username">Username</label>
+		            <input id="reg-username" name="username" class="form-input" type="text" required />
+		          </div>
+		          <div class="form-group">
+		            <label for="reg-password">Password</label>
+		            <input id="reg-password" name="password" class="form-input" type="password" required />
+		          </div>
+		          <button type="submit" class="btn-primary">Register</button>
+		        </form>
+		        <div class="auth-footer">
+		          <p>Already have an account? <a href="#" id="toLoginLink" class="auth-link">Log in</a></p>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+		<script src="/js/script.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	</body>
 </html>

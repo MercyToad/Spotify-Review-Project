@@ -50,6 +50,13 @@ db.connect()
 // Middleware
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
 
 // Initialize session variables
 app.use(
@@ -60,61 +67,78 @@ app.use(
   })
 );
 
+const bearer_token = `Bearer ${process.env.API_KEY}`;
+
+
+
 app.use(
-  express.static(path.join(__dirname, 'resources'))
+  express.static(path.join(__dirname, 'resourses'))
 );
 
-//Home route
+// Root route — serve public landing page
 app.get('/', (req, res) => {
-  res.redirect('/login');
+  const username = req.session && req.session.user ? req.session.user.username : null;
+  return res.render('pages/public', { layout: 'main', username });
 });
+
+// Minimal My Reviews route (no API, frontend-only reviews)
+app.get('/my-reviews', (req, res) => {
+  const username = req.session && req.session.user ? req.session.user.username : 'Guest';
+  res.render('pages/my-reviews', { layout: 'main', username });
+});
+
+// Note: My Reviews page is served via the views; frontend handles review creation client-side.
 
 app.get('/welcome', (req, res) => {
   res.status(200).json({ status: 'success', message: 'Welcome!' });
 });
 
-// Login Page
+// Login Page GET
 app.get('/login', (req, res) => {
   res.render('pages/login', { layout: 'auth' });
 });
 
+// Login Page POST
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    return res.status(400).render('pages/login', {
+      layout: 'auth',
+      error: 'Must enter username and password',
+    });
+  }
 
   try {
-    // Query using the correct column names from create.sql
     const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
 
     if (!user) {
-      return res.render('pages/login', {
+      return res.status(401).render('pages/login', {
         layout: 'auth',
-        error: 'Username not found. Please register.'
+        error: 'Username not found. Please register.',
       });
     }
 
-    // Compare password with the password from database
-    if (await bcrypt.compare(password, user.password_hash)) {
-      req.session.user = { 
-        id: user.user_id,  // Using user_id from create.sql
-        username: user.username 
-      };
-      req.session.save();
-      return res.redirect('/home');
-    } else {
-      return res.render('pages/login', {
+    const match = await bcrypt.compare(password, user.password_hash);
+    if (!match) {
+      return res.status(401).render('pages/login', {
         layout: 'auth',
-        error: 'Incorrect password.'
+        error: 'Incorrect password.',
       });
     }
+
+    req.session.user = { id: user.user_id, username: user.username };
+    req.session.save(() => {
+      return res.redirect('/home');
+    });
   } catch (error) {
     console.error('Login error:', error);
-    res.render('pages/login', {
+    return res.status(500).render('pages/login', {
       layout: 'auth',
-      error: 'An error occurred during login.'
+      error: 'An error occurred during login. Please try again.',
     });
   }
 });
-
 
 // Register Page GET
 app.get('/register', (req, res) => {
@@ -123,31 +147,32 @@ app.get('/register', (req, res) => {
 
 // Register Page POST
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    return res.status(400).render('pages/register', {
+      layout: 'auth',
+      error: 'Must enter username and password',
+    });
+  }
+
   try {
-    // Check if username already exists
     const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
-    
     if (existingUser) {
-      return res.render('pages/register', {
+      return res.status(409).render('pages/register', {
         layout: 'auth',
-        error: 'Username already exists. Please choose another.'
+        error: 'Username already exists. Please choose another.',
       });
     }
-    //hash password
+
     const hash = await bcrypt.hash(password, 10);
-    
-    // Insert new user into database
     await db.none('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
-    
-    // Redirect to login page after successful registration
-    res.redirect('/login');
+    return res.redirect('/login');
   } catch (error) {
     console.error('Registration error:', error);
-    res.render('pages/register', {
+    return res.status(500).render('pages/register', {
       layout: 'auth',
-      error: 'An error occurred during registration. Please try again.'
+      error: 'An error occurred during registration. Please try again.',
     });
   }
 });
@@ -160,24 +185,80 @@ const auth = (req, res, next) => {
   next();
 };
 
-// Home Page (protected)
-app.get('/home', auth, (req, res) => {
-  res.render('pages/home', { 
+// Home Page. If a user is logged in we pass the username, otherwise render public home.
+app.get('/home', async (req, res) => {
+  const username = req.session && req.session.user ? req.session.user.username : null;
+  let songs;
+  // if (!username) {
+    const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', { //hard coded top 50 playlist cuz i cant access official spotify one. unsure if this will ever change
+    method: 'GET',
+    headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': bearer_token,
+    },
+    });
+    const data = await response.json();
+    songs = data.items;
+    console.log(songs);
+  // }
+  // else {
+
+  // }
+  return res.render('pages/home', {
     layout: 'main',
-    username: req.session.user.username 
+    username: username,
+    songs: songs,
   });
 });
 
 // Logout
-app.get('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).send('Could not log out.');
     }
-    res.redirect('/login');
+    // After logout, send user to the public landing page
+    res.redirect('/');
   });
 });
 
+app.get('/searchResults', async (req, res) => {
+  const query = req.query.song_name;
+  const params = new URLSearchParams({
+    'q': query,
+    'type': 'track',
+    'limit': 5,
+  });
+  console.log(params);
+  const response = fetch(`https://api.spotify.com/v1/search?${params}`, {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': bearer_token,
+  },
+  // body: JSON.stringify(postData),
+});
+// .then(response => response.json())
+// .then(data => console.log(data))
+// .catch(error => console.error('Error:', error))
+// .return
+
+
+  // try {
+  //   const response = await fetch(url);
+  //   if (!response.ok) {
+  //     throw new Error(`Network response was not ok: ${response.status}`);
+  //   }
+
+  //   // 3. Parse the response body as JSON
+  //   const data = await response.json();
+
+  //   // 4. Use the data
+  //   console.log(data);
+});
+
 // starting the server and keeping the connection open to listen for more requests
+// server?
+
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');

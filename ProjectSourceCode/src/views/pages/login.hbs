@@ -1,17 +1,17 @@
-{{#> layout "auth"}}
-<div class="auth-container">
-  <div class="auth-card">
-    <!-- Logo -->
-    <div class="auth-header">
-      <div class="auth-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18V5l12-2v13"></path>
-          <circle cx="6" cy="18" r="3"></circle>
-          <circle cx="18" cy="16" r="3"></circle>
-        </svg>
-      </div>
-      <h1>SongRate</h1>
-      <p class="auth-subtitle">Welcome back</p>
+{{!--
+  Login page
+  - Simple login form that posts to /login. Uses Bootstrap classes for inputs and buttons.
+  - The optional `{{> message}}` partial can display flash messages (kept commented).
+--}}
+
+<div style="width:60%; margin:6% auto">
+  <form action="/login" method="POST">
+  <h1>
+    Login
+  </h1>
+    <div class="form-group">
+      <label for="exampleUsername">Username</label>
+      <input type="text" class="form-control" name="username">
     </div>
 
     <!-- Error Message -->

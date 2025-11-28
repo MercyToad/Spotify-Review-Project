@@ -1,3 +1,10 @@
+{{!--
+  Home page template
+  - Shows recommended songs, albums and a right-hand sidebar with widgets.
+  - Uses card components (content-card) and the grid `home-grid-layout` to arrange content.
+  - This file is rendered into `main.hbs` via the layout system.
+--}}
+
 <div class="home-grid-layout">
   <!-- 
     MAIN CONTENT COLUMN (Left)
@@ -9,39 +16,9 @@
       <h2>Recommended for You</h2>
       <p class="section-subtitle">Based on your listening history</p>
       <div class="content-grid three-col">
-        <!-- Card 1 -->
-        <div class="content-card">
-          <img src="https://placehold.co/300x300/c026d3/white?text=Album+Art" alt="Album Art">
-          <h3>Blinding Lights</h3>
-          <p>The Weeknd</p>
-          <div class="card-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.5</span>
-            <span class="review-count">234 reviews</span>
-          </div>
-        </div>
-        <!-- Card 2 -->
-        <div class="content-card">
-          <img src="https://placehold.co/300x300/c026d3/white?text=Album+Art" alt="Album Art">
-          <h3>Levitating</h3>
-          <p>Dua Lipa</p>
-          <div class="card-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.7</span>
-            <span class="review-count">189 reviews</span>
-          </div>
-        </div>
-        <!-- Card 3 -->
-        <div class="content-card">
-          <img src="https://placehold.co/300x300/c026d3/white?text=Album+Art" alt="Album Art">
-          <h3>Save Your Tears</h3>
-          <p>The Weeknd</p>
-          <div class="card-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.3</span>
-            <span class="review-count">158 reviews</span>
-          </div>
-        </div>
+        {{#each songs}}
+          {{> song-card}}
+        {{/each}}
       </div>
     </section>
 
@@ -69,7 +46,7 @@
       <h2>Your Recent Reviews</h2>
       <div class="content-grid three-col">
         <!-- Review Card 1 -->
-        <div class="review-card-long">
+        <div class="review-card-long glass-card">
           <div class="review-card-header">
             <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text=A" alt="Avatar">
             <div class="review-user-info">
@@ -96,7 +73,7 @@
   <aside class="sidebar-content">
     
     <!-- "From Your Playlists" Widget -->
-    <section class="sidebar-widget">
+    <section class="sidebar-widget glass-card">
       <h3>From Your Playlists</h3>
       <p class="section-subtitle">Based on "Workout Mix"</p>
       <ul class="widget-list">
@@ -126,7 +103,7 @@
     </section>
 
     <!-- "Community Highlights" Widget -->
-    <section class="sidebar-widget">
+    <section class="sidebar-widget glass-card">
       <h3>Community Highlights</h3>
       <p class="section-subtitle">Trending Now</p>
       <ul class="widget-list">

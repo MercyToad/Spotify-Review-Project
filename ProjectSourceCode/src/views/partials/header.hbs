@@ -1,6 +1,12 @@
+{{!--
+  Header partial
+  - Contains: logo, main navigation links, search input, and user profile menu.
+  - Included in `main.hbs` layout via `{{> header}}`.
+--}}
 <header class="site-header">
   <div class="header-container">
     
+    {{!-- Logo and title (left) --}}
     <!-- Logo and Title -->
     <a href="/home" class="header-logo">
       <div class="logo-icon">
@@ -14,6 +20,7 @@
       <span class="logo-text">SongRate</span>
     </a>
 
+    {{!-- Top navigation links (center) --}}
     <!-- Navigation Links -->
     <nav class="site-nav">
       <a href="/home">Home</a>
@@ -22,6 +29,7 @@
       <a href="/profile">Profile</a>
     </nav>
 
+    {{!-- Search input (middle) --}}
     <!-- Search Bar -->
     <div class="header-search">
       <!-- Inlined "Search" icon -->
@@ -32,9 +40,10 @@
       <input type="text" placeholder="Search songs, artists, albums..." class="search-input" />
     </div>
 
+    {{!-- Profile icon and dropdown menu (right) --}}
     <!-- Profile Icon with Accordion Menu -->
     <div class="header-profile-container">
-      <div class="header-profile" id="profileBtn">
+      <div class="header-profile" id="profileBtn" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
         <!-- Inlined "User" icon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
@@ -43,20 +52,22 @@
       </div>
       
       <!-- Accordion Menu -->
-      <div class="profile-menu" id="profileMenu">
-        <a href="/profile" class="profile-menu-item">
+      {{!-- Dropdown menu for quick links (My Profile, My Reviews, Settings, Login) --}}
+      <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
+        <a href="/profile" class="profile-menu-item" role="menuitem">
           <span>My Profile</span>
         </a>
-        <a href="/my-reviews" class="profile-menu-item">
+        <a href="/my-reviews" class="profile-menu-item" role="menuitem">
           <span>My Reviews</span>
         </a>
-        <a href="/settings" class="profile-menu-item">
+        <a href="/settings" class="profile-menu-item" role="menuitem">
           <span>Settings</span>
         </a>
         <hr class="profile-menu-divider" />
-        <a href="/login" class="profile-menu-item logout">
+        <button type="button" id="openAuthModal" class="profile-menu-item logout" role="menuitem">
           <span>Login</span>
-        </a>
+        </button>
       </div>
     </div>
 </header>
+
