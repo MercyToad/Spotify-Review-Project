@@ -37,13 +37,6 @@ const dbConfig = {
 
 const db = pgp(dbConfig);
 
-app.engine('hbs', hbs.engine);
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
 // test your database
 db.connect()
   .then(obj => {
@@ -58,8 +51,10 @@ db.connect()
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
   })
 );
 

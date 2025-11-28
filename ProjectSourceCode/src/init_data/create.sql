@@ -2,7 +2,7 @@
 -- ============================
 -- USERS
 -- ============================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS  users (
     user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(50) NOT NULL, -- we can add spotify id later if we have time?
