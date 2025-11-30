@@ -76,9 +76,28 @@ app.use(
 );
 
 // Root route — serve public landing page
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : null;
-  return res.render('pages/public', { layout: 'main', username });
+  const query = 'SELECT spotify_id FROM songs ORDER BY average_rating DESC LIMIT 7'
+    const song_ids = await db.any(query);
+    songs = [];
+    for (const i of song_ids) {
+      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': bearer_token,
+      },
+      });
+      const data = await response.json();
+      songs.push(data);
+    }
+    console.log(songs);
+  return res.render('pages/public', { 
+    layout: 'main',
+    username,
+    songs: songs
+  });
 });
 
 // Minimal My Reviews route (no API, frontend-only reviews)
@@ -189,7 +208,7 @@ const auth = (req, res, next) => {
 app.get('/home', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : null;
   let songs;
-  // if (!username) {
+  if (username) {
     const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', { //hard coded top 50 playlist cuz i cant access official spotify one. unsure if this will ever change
     method: 'GET',
     headers: {
@@ -200,10 +219,23 @@ app.get('/home', async (req, res) => {
     const data = await response.json();
     songs = data.items;
     console.log(songs);
-  // }
-  // else {
-
-  // }
+  }
+  else {
+    const query = 'SELECT spotify_id FROM songs ORDER BY average_rating DESC LIMIT 7'
+    const song_ids = await db.any(query);
+    songs = [];
+    for (const i of song_ids) {
+      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': bearer_token,
+      },
+      });
+      const data = await response.json();
+      songs.push(data);
+    }
+  }
   return res.render('pages/home', {
     layout: 'main',
     username: username,

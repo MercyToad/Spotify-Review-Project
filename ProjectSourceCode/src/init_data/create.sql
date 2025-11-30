@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS songs (
     title VARCHAR(255) NOT NULL,
     artist VARCHAR(255),
     album VARCHAR(255),
+    average_rating DECIMAL(2,1) CHECK (average_rating BETWEEN 1 AND 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

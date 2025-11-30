@@ -18,11 +18,11 @@ INSERT INTO artist (name, spotify_url, image_url, genres) VALUES
 ('Gwen Stefani', 'http://open.spotify.com/artist/gwen', 'https://placehold.co/400', ARRAY['pop', 'dance pop']);
 
 -- 3. Insert Songs (with the specific Spotify IDs requested)
-INSERT INTO songs (spotify_id, title, artist, album) VALUES
-('1lNRVjK8MukRZpeurYssIx', 'Shakedown Street', 'Grateful Dead', 'Shakedown Street'),
-('6aBUnkXuCEQQHAlTokv9or', 'This Must Be the Place (Naive Melody)', 'Talking Heads', 'Speaking in Tongues'),
-('5exa8iAaKpyO6dm8MZgGHV', 'Like or Like Like', 'Miniature Tigers', 'Tell It to the Volcano'),
-('1q9siR3OqGFnTeqFxwzN1S', 'The Sweet Escape', 'Gwen Stefani', 'The Sweet Escape');
+INSERT INTO songs (spotify_id, title, artist, album, average_rating) VALUES
+('1lNRVjK8MukRZpeurYssIx', 'Shakedown Street', 'Grateful Dead', 'Shakedown Street', 4.9),
+('6aBUnkXuCEQQHAlTokv9or', 'This Must Be the Place (Naive Melody)', 'Talking Heads', 'Speaking in Tongues', 4.2),
+('5exa8iAaKpyO6dm8MZgGHV', 'Like or Like Like', 'Miniature Tigers', 'Tell It to the Volcano', 3.1),
+('1q9siR3OqGFnTeqFxwzN1S', 'The Sweet Escape', 'Gwen Stefani', 'The Sweet Escape', 4.0);
 
 -- 4. Link Songs to Artists
 -- We must look up the IDs dynamically because they are SERIAL integers now
