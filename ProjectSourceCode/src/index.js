@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const qs = require('querystring');
 
 //(FROM LAB 7)
 //-------------Connect to database--------------------//
@@ -67,6 +68,67 @@ app.use(
   })
 );
 
+// --- Spotify token helpers (session-based, minimal changes) ---
+const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+
+async function refreshAccessTokenForSession(req) {
+  const spotify = req.session && req.session.spotify;
+  if (!spotify || !spotify.refreshToken) throw new Error('No refresh token available');
+
+  const authHeader = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64');
+
+  const body = qs.stringify({
+    grant_type: 'refresh_token',
+    refresh_token: spotify.refreshToken,
+  });
+
+  const resp = await axios.post(SPOTIFY_TOKEN_URL, body, {
+    headers: {
+      Authorization: `Basic ${authHeader}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+
+  const data = resp.data;
+  const newAccess = data.access_token;
+  const newRefresh = data.refresh_token || spotify.refreshToken;
+  const expiresIn = data.expires_in || 3600;
+
+  req.session.spotify = {
+    accessToken: newAccess,
+    refreshToken: newRefresh,
+    expiresAt: Date.now() + expiresIn * 1000 - 60000, // 60s buffer
+  };
+  await new Promise((resolve) => req.session.save(resolve));
+  return req.session.spotify.accessToken;
+}
+
+async function ensureSpotifyToken(req) {
+  if (!req.session || !req.session.spotify) return null;
+  if (!req.session.spotify.accessToken) return null;
+  if (Date.now() < (req.session.spotify.expiresAt || 0)) {
+    return req.session.spotify.accessToken;
+  }
+  // expired -> refresh
+  return refreshAccessTokenForSession(req);
+}
+
+// Dev helper: set Spotify tokens in session (for testing with Postman)
+app.post('/dev/set-spotify-tokens', (req, res) => {
+  const { access_token, refresh_token, expires_in } = req.body || {};
+  if (!access_token || !refresh_token || !expires_in) {
+    return res.status(400).json({ error: 'Provide access_token, refresh_token, expires_in' });
+  }
+  req.session.spotify = {
+    accessToken: access_token,
+    refreshToken: refresh_token,
+    expiresAt: Date.now() + Number(expires_in) * 1000 - 60000,
+  };
+  req.session.save(() => res.json({ status: 'ok' }));
+});
+
 const bearer_token = `Bearer ${process.env.API_KEY}`;
 
 
@@ -82,12 +144,14 @@ app.get('/', async (req, res) => {
     const song_ids = await db.any(query);
     songs = [];
     for (const i of song_ids) {
-      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': bearer_token,
-      },
+      const sessionToken = await ensureSpotifyToken(req).catch(() => null);
+      const authHeader = sessionToken ? `Bearer ${sessionToken}` : bearer_token;
+      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': authHeader,
+        },
       });
       const data = await response.json();
       songs.push(data);
@@ -209,12 +273,14 @@ app.get('/home', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : null;
   let songs;
   if (username) {
-    const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', { //hard coded top 50 playlist cuz i cant access official spotify one. unsure if this will ever change
-    method: 'GET',
-    headers: {
-    'Content-Type': 'application/json; charset=UTF-8',
-    'Authorization': bearer_token,
-    },
+    const sessionToken = await ensureSpotifyToken(req).catch(() => null);
+    const authHeader = sessionToken ? `Bearer ${sessionToken}` : bearer_token;
+    const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': authHeader,
+      },
     });
     const data = await response.json();
     songs = data.items;
@@ -225,12 +291,14 @@ app.get('/home', async (req, res) => {
     const song_ids = await db.any(query);
     songs = [];
     for (const i of song_ids) {
-      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': bearer_token,
-      },
+      const sessionToken = await ensureSpotifyToken(req).catch(() => null);
+      const authHeader = sessionToken ? `Bearer ${sessionToken}` : bearer_token;
+      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': authHeader,
+        },
       });
       const data = await response.json();
       songs.push(data);
@@ -262,14 +330,22 @@ app.get('/searchResults', async (req, res) => {
     'limit': 5,
   });
   console.log(params);
-  const response = fetch(`https://api.spotify.com/v1/search?${params}`, {
-  method: 'GET',
-  headers: {
-    'Content-Type': 'application/json; charset=UTF-8',
-    'Authorization': bearer_token,
-  },
-  // body: JSON.stringify(postData),
-});
+  try {
+    const sessionToken = await ensureSpotifyToken(req).catch(() => null);
+    const authHeader = sessionToken ? `Bearer ${sessionToken}` : bearer_token;
+    const response = await fetch(`https://api.spotify.com/v1/search?${params}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': authHeader,
+      },
+    });
+    const data = await response.json();
+    return res.json(data);
+  } catch (err) {
+    console.error('Search error', err.message || err);
+    return res.status(500).json({ error: 'Search failed' });
+  }
 // .then(response => response.json())
 // .then(data => console.log(data))
 // .catch(error => console.error('Error:', error))
