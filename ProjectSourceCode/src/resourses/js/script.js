@@ -113,6 +113,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // search function
+  const searchForm = document.getElementById('search-form');
+  const searchInput = document.getElementById('search-input');
+  const dropdown = document.getElementById('search-results-dropdown');
+
+  searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); // STOP page reload
+      
+      const query = searchInput.value.trim();
+      if (!query) return;
+      console.log("query" + query);
+
+      try {
+          console.log("hello");
+          const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
+          console.log("goodbye");
+          const results = await response.json();
+          console.log(results);
+          const songs = results.tracks.items;
+          console.log("songs items: " + songs);
+
+          dropdown.innerHTML = '';
+          dropdown.style.display = null;
+
+          if (results.length === 0) {
+              dropdown.innerHTML = '<div class="profile-menu-item">No results found</div>';
+              return;
+          }
+
+          songs.forEach(item => {
+              const div = document.createElement('div');
+              div.classList.add('profile-menu-item');
+            
+              div.textContent = item.name; 
+              
+              // div.addEventListener('click', () => {
+              //     window.location.href = `/details/${item.id}`; // Example navigation
+              // });
+
+              dropdown.appendChild(div);
+          });
+
+      } catch (error) {
+          console.error('Error fetching search results:', error);
+      }
+  });
+
+  document.addEventListener('click', (e) => {
+      if (!searchForm.contains(e.target)) {
+          dropdown.style.display = "none";
+      }
+  });
+
     // ------------------------------
     // Auth modal: open, close, switch views
     // ------------------------------

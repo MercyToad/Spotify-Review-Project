@@ -208,7 +208,7 @@ const auth = (req, res, next) => {
 app.get('/home', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : null;
   let songs;
-  if (username) {
+  if (!username) {
     const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', { //hard coded top 50 playlist cuz i cant access official spotify one. unsure if this will ever change
     method: 'GET',
     headers: {
@@ -221,8 +221,12 @@ app.get('/home', async (req, res) => {
     console.log(songs);
   }
   else {
-    const query = 'SELECT spotify_id FROM songs ORDER BY average_rating DESC LIMIT 7'
-    const song_ids = await db.any(query);
+    // const songs_query = `SELECT song_id, user_id, rating FROM reviews WHERE user_id='${}' ORDER BY rating DESC LIMIT 1;`
+    // const songs = await db.any(songs_query);
+    // const users_query = `SELECT user_id FROM reviews WHERE song_id = ${} ORDER BY average_rating DESC LIMIT 1;`
+    // const users = await db.any(users_query);
+    // const rec_songs_query = `SELECT song_id FROM reviews WHERE song_id != ${} AND user_id = ${} ORDER BY average_rating DESC LIMIT 1;`
+    // const rec_songs = await db.any(rec_songs_query);
     songs = [];
     for (const i of song_ids) {
       const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
@@ -262,31 +266,19 @@ app.get('/searchResults', async (req, res) => {
     'limit': 5,
   });
   console.log(params);
-  const response = fetch(`https://api.spotify.com/v1/search?${params}`, {
+  const response = await fetch(`https://api.spotify.com/v1/search?${params}`, {
   method: 'GET',
   headers: {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': bearer_token,
   },
   // body: JSON.stringify(postData),
-});
-// .then(response => response.json())
-// .then(data => console.log(data))
-// .catch(error => console.error('Error:', error))
-// .return
-
-
-  // try {
-  //   const response = await fetch(url);
-  //   if (!response.ok) {
-  //     throw new Error(`Network response was not ok: ${response.status}`);
-  //   }
-
-  //   // 3. Parse the response body as JSON
-  //   const data = await response.json();
-
-  //   // 4. Use the data
-  //   console.log(data);
+  });
+  // console.log(response);
+  const data = await response.json();
+  console.log("data");
+  console.log(data.tracks);
+  res.json(data);
 });
 
 // starting the server and keeping the connection open to listen for more requests
