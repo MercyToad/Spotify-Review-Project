@@ -94,7 +94,9 @@ async function refreshAccessTokenForSession(req) {
   const data = resp.data;
   const newAccess = data.access_token;
   const newRefresh = data.refresh_token || spotify.refreshToken;
-  const expiresIn = data.expires_in || 3600;
+  const expiresIn = data.expires_in || 10;
+  // Logging for debug/testing: show refresh activity (dev only)
+  console.log('[spotify] refreshed access token — old expiresAt:', spotify.expiresAt, 'new expiresIn:', expiresIn);
 
   req.session.spotify = {
     accessToken: newAccess,
@@ -102,6 +104,7 @@ async function refreshAccessTokenForSession(req) {
     expiresAt: Date.now() + expiresIn * 1000 - 60000, // 60s buffer
   };
   await new Promise((resolve) => req.session.save(resolve));
+  console.log('[spotify] saved new access token (first 8 chars):', (newAccess||'').slice(0,8), 'expiresAt:', req.session.spotify.expiresAt);
   return req.session.spotify.accessToken;
 }
 
@@ -127,6 +130,18 @@ app.post('/dev/set-spotify-tokens', (req, res) => {
     expiresAt: Date.now() + Number(expires_in) * 1000 - 60000,
   };
   req.session.save(() => res.json({ status: 'ok' }));
+});
+
+// Dev helper: inspect session spotify tokens (safe for local testing only)
+app.get('/dev/spotify-session', (req, res) => {
+  const s = req.session && req.session.spotify;
+  if (!s) return res.json({ spotify: null });
+  return res.json({
+    accessTokenPreview: (s.accessToken || '').slice(0, 16),
+    refreshTokenPreview: (s.refreshToken || '').slice(0, 8),
+    expiresAt: s.expiresAt,
+    expired: Date.now() >= (s.expiresAt || 0),
+  });
 });
 
 const bearer_token = `Bearer ${process.env.API_KEY}`;
