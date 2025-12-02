@@ -12,6 +12,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const profileBtn = document.getElementById('profileBtn');
   const profileMenu = document.getElementById('profileMenu');
 
+  // If we're on the public homepage, force navbar/profile links to point to root
+  if (window.location.pathname === '/') {
+    // site nav links should not navigate away — keep users on public homepage
+    const navLinks = document.querySelectorAll('.site-nav a');
+    navLinks.forEach(a => { a.setAttribute('href', '/'); });
+
+    // header logo: point to root
+    const logoLink = document.querySelector('.header-logo');
+    if (logoLink) logoLink.setAttribute('href', '/');
+
+    // profile-menu anchors should also point to root (public behaviour)
+    const profileAnchors = document.querySelectorAll('.profile-menu a');
+    profileAnchors.forEach(a => { a.setAttribute('href', '/'); });
+  }
+
   if (profileBtn && profileMenu) {
     // Toggle menu when clicking the profile button
     profileBtn.addEventListener('click', function(e) {
@@ -98,6 +113,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // search function
+  const searchForm = document.getElementById('search-form');
+  const searchInput = document.getElementById('search-input');
+  const dropdown = document.getElementById('search-results-dropdown');
+
+  searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); // STOP page reload
+      
+      const query = searchInput.value.trim();
+      if (!query) return;
+      console.log("query" + query);
+
+      try {
+          console.log("hello");
+          const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
+          console.log("goodbye");
+          const results = await response.json();
+          console.log(results);
+          const songs = results.tracks.items;
+          console.log("songs items: " + songs);
+
+          dropdown.innerHTML = '';
+          dropdown.style.display = null;
+
+          if (results.length === 0) {
+              dropdown.innerHTML = '<div class="profile-menu-item">No results found</div>';
+              return;
+          }
+
+          songs.forEach(item => {
+              const div = document.createElement('div');
+              div.classList.add('profile-menu-item');
+            
+              div.textContent = item.name; 
+              
+              // div.addEventListener('click', () => {
+              //     window.location.href = `/details/${item.id}`; // Example navigation
+              // });
+
+              dropdown.appendChild(div);
+          });
+
+      } catch (error) {
+          console.error('Error fetching search results:', error);
+      }
+  });
+
+  document.addEventListener('click', (e) => {
+      if (!searchForm.contains(e.target)) {
+          dropdown.style.display = "none";
+      }
+  });
+
     // ------------------------------
     // Auth modal: open, close, switch views
     // ------------------------------
@@ -137,6 +205,18 @@ document.addEventListener('DOMContentLoaded', function() {
       openAuthBtn.addEventListener('click', function(e) {
         e.preventDefault();
         showAuthModal('login');
+      });
+    }
+
+    // Bind any CTA elements that should open the auth modal (public hero uses this)
+    const openAuthCTAs = document.querySelectorAll('.open-auth-cta');
+    if (openAuthCTAs && openAuthCTAs.length) {
+      openAuthCTAs.forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          const view = el.dataset.authView || el.getAttribute('data-auth-view') || 'register';
+          showAuthModal(view);
+        });
       });
     }
 
@@ -222,8 +302,8 @@ document.addEventListener('DOMContentLoaded', function() {
           logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem(MOCK_AUTH_KEY);
-            // reload to simulate server-side logout
-            window.location.href = '/home';
+            // reload to simulate server-side logout — go to public landing page
+            window.location.href = '/';
           });
         }
       }

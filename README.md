@@ -11,6 +11,9 @@ Aayush Sharma,
 Zack Biehl
 
 Technology stack used in this project:
+    Frontend:   Handlebars, CSS, and JavaScript
+    Backend:    Node.js and Express
+    Database:   Postgres
 
 Prerequisites to run the application:
 
@@ -18,4 +21,4 @@ How to run app locally:
 
 How to run tests:
 
-Link to the deployed application:
+Link to the deployed application: https://spotify-review-project.onrender.com/home

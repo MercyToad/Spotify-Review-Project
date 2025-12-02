@@ -30,6 +30,8 @@ describe('Server!', () => {
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
+//note: not currently testing emssages because we reutrn them on the render of the page
+
 describe('Testing Register API', () => {
   it('positive : /register', done => {
     chai
@@ -38,7 +40,7 @@ describe('Testing Register API', () => {
       .send({username: 'username', password: 'password'})
       .end((err, res) => {
         expect(res).to.have.status(201);
-        expect(res.body.message).to.equals('Success');
+        // expect(res.body.message).to.equals('Success');
         done();
       });
   });

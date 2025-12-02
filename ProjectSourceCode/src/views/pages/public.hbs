@@ -1,0 +1,32 @@
+{{!-- Public landing page (frontend-only). Shares header/footer via layout `main.hbs`. --}}
+
+{{> home-hero}}
+
+<section class="public-cards">
+  <div class="public-cards-inner">
+    <h2 class="public-section-title">SongRate lets you...</h2>
+
+    <div class="public-card glass-card">
+      <div class="public-card-icon" aria-hidden="true">🎧</div>
+      <h3 class="public-card-title">Myreviews</h3>
+      <p class="public-card-body">Short description — you can edit this text later.</p>
+    </div>
+
+    <div class="public-card glass-card">
+      <div class="public-card-icon" aria-hidden="true">🔎</div>
+      <h3 class="public-card-title">Discover</h3>
+      <p class="public-card-body">Short description — you can edit this text later.</p>
+    </div>
+  </div>
+</section>
+
+<section class="popular-week">
+  <div class="popular-week-inner">
+    <h2 class="section-heading">Popular This Week</h2>
+    <div class="popular-list" role="list">
+      {{#each songs}}
+        {{> public-song-card}}
+      {{/each}}
+    </div>
+  </div>
+</section>

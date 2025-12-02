@@ -1,0 +1,9 @@
+11/19:
+Duration ~15 minutes
+
+We talked about making sure we are able to finish all of the features that we want
+to implement. We also talked about trying to get the API key to automatically renew,
+instead of having to use postman to obtain one every hour. We also made sure to set
+up a time for our presentation.
+
+https://spotify-review-project.onrender.com/home
