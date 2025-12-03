@@ -106,5 +106,4 @@ dist
 # Package lock
 package-lock.json
 
-
 init_db.sh
