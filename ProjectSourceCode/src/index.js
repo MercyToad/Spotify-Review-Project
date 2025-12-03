@@ -92,7 +92,7 @@ app.get('/', async (req, res) => {
       const data = await response.json();
       songs.push(data);
     }
-    console.log(songs);
+    // console.log(songs);
   return res.render('pages/public', { 
     layout: 'main',
     username,
@@ -101,9 +101,30 @@ app.get('/', async (req, res) => {
 });
 
 // Minimal My Reviews route (no API, frontend-only reviews)
-app.get('/my-reviews', (req, res) => {
+app.get('/my-reviews', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : 'Guest';
-  res.render('pages/my-reviews', { layout: 'main', username });
+  if (req.query.song_id) {
+    const response = await fetch(`https://api.spotify.com/v1/tracks/${encodeURIComponent(req.query.song_id)}`, { 
+    method: 'GET',
+    headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': bearer_token,
+    },
+    });
+    const data = await response.json();
+    console.log(req.song_id);
+    const songName = data.name;
+    console.log(songName);
+    res.render('pages/my-reviews', 
+      { layout: 'main',
+        username,
+        song_id: req.song_id,
+        song_name: songName,
+       });
+  }
+  else {
+    res.render('pages/my-reviews', { layout: 'main', username, display: 'display:none;', });
+  }
 });
 
 // Note: My Reviews page is served via the views; frontend handles review creation client-side.
@@ -228,7 +249,7 @@ app.get('/home', async (req, res) => {
     });
     const data = await response.json();
     songs = data.items;
-    console.log(songs);
+    // console.log(songs);
   }
   else {
     // const songs_query = `SELECT song_id, user_id, rating FROM reviews WHERE user_id='${}' ORDER BY rating DESC LIMIT 1;`
@@ -275,7 +296,7 @@ app.get('/searchResults', async (req, res) => {
     'type': 'track',
     'limit': 5,
   });
-  console.log(params);
+  // console.log(params);
   const response = await fetch(`https://api.spotify.com/v1/search?${params}`, {
   method: 'GET',
   headers: {
@@ -286,8 +307,8 @@ app.get('/searchResults', async (req, res) => {
   });
   // console.log(response);
   const data = await response.json();
-  console.log("data");
-  console.log(data.tracks);
+  // console.log("data");
+  // console.log(data.tracks);
   res.json(data);
 });
 

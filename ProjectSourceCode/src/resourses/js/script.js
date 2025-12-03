@@ -145,12 +145,15 @@ document.addEventListener('DOMContentLoaded', function() {
           songs.forEach(item => {
               const div = document.createElement('div');
               div.classList.add('profile-menu-item');
-            
-              div.textContent = item.name; 
+              div.textContent = "'" + item.name + "' by " + item.artists[0].name; 
               
-              // div.addEventListener('click', () => {
-              //     window.location.href = `/details/${item.id}`; // Example navigation
-              // });
+              div.addEventListener('click', () => {
+                  window.location.href = `/my-reviews?song_id=${item.id}`;
+                  // const addReviewContainer = document.getElementById('reviewFormContainer');
+                  // addReviewContainer.style.display = null;
+                  // document.getElementById('songTitle').value = item.name;
+                  // document.getElementById('song-id-input').value = item.id;
+              });
 
               dropdown.appendChild(div);
           });

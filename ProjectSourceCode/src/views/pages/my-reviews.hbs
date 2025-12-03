@@ -17,11 +17,12 @@
   </div>
 
   <!-- Review form (hidden by default) -->
-  <div id="reviewFormContainer" class="review-form" style="display:none; margin-top:1rem;">
+  <div id="reviewFormContainer" class="review-form" style="{{display}} margin-top:1rem;">
     <form id="reviewForm">
+      <input type="hidden" id="song-id-input" name="song_id" value="{{song_id}}"> <!-- hidden input so i can send the id too so its not like a triple query-->
       <div class="form-group">
         <label for="songTitle">Song Title</label>
-        <input id="songTitle" name="songTitle" class="form-input" placeholder="Enter song title" required />
+        <input id="songTitle" name="songTitle" class="form-input" placeholder="Enter song title" value="{{song_name}}" required />
       </div>
       <div class="form-group">
         <label for="reviewText">Review</label>
