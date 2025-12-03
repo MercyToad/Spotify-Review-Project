@@ -720,6 +720,19 @@ input, button, textarea {
   line-height: 1.4;
 }
 
+.star {
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.review-star-empty {
+  color: var(--foreground);
+}
+
+.review-star-selected {
+  color: var(--star);
+}
+
 /* -------------------------------------------------------------------------- */
 /* 7. DISCOVER PAGE COMPONENTS                                                */
 /* -------------------------------------------------------------------------- */
