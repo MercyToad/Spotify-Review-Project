@@ -299,7 +299,7 @@ app.get('/home', async (req, res) => {
     const data = await response.json();
     songs = data.items;
     album = data.items[0].track.album;
-    const query = `SELECT * FROM review ORDER BY created_at DESC LIMIT 1;`;
+    const query = `SELECT * FROM review INNER JOIN songs ON review.song_id = songs.song_id ORDER BY review.created_at DESC LIMIT 1;`;
     const recentReview = await db.oneOrNone(query);
     // console.log(album);
     // console.log(songs);
