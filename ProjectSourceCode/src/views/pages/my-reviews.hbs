@@ -1,77 +1,416 @@
 {{!--
   My Reviews section
-  - This section contains: a header, a button to add a review, a client-side form (hidden by default),
-  - and a list of existing reviews. The client-side code in `script.js` handles toggling the form
-  - and rendering new reviews using the Handlebars template included below.
+  - Shows user's reviews in a list format with artwork
+  - Includes sort and filter options (excluding popularity)
 --}}
 
-<section class="content-section" id="myReviewsSection" data-username="{{username}}">
-  <div class="header-row" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
-    <div>
-      <h2>My Reviews</h2>
-      <p class="section-subtitle">Write and view your song reviews</p>
-    </div>
-    <div>
-      <button id="addReviewBtn" class="btn-primary" aria-label="Add review">+ Add Review</button>
-    </div>
-  </div>
+<style>
+  .my-reviews-container {
+    width: 90%;
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
 
-  <!-- Review form (hidden by default) -->
-  <div id="reviewFormContainer" class="review-form" style="display:none; margin-top:1rem;">
-    <form id="reviewForm">
-      <div class="form-group">
-        <label for="songTitle">Song Title</label>
-        <input id="songTitle" name="songTitle" class="form-input" placeholder="Enter song title" required />
-      </div>
-      <div class="form-group">
-        <label for="reviewText">Review</label>
-        <textarea id="reviewText" name="reviewText" class="form-input" placeholder="Write your review" rows="4" required></textarea>
-      </div>
-      <div style="display:flex;gap:0.5rem;">
-        <button type="submit" class="btn-primary">Add</button>
-        <button type="button" id="cancelReviewBtn" class="btn-secondary">Cancel</button>
-      </div>
-    </form>
-  </div>
+  .my-reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 
-  <!-- Reviews list -->
-  <div id="reviewsList" style="margin-top:1.5rem; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem;">
-    {{#if reviews}}
-      {{#each reviews}}
-        <div class="review-card-long">
-          <div class="review-card-header">
-            <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text={{usernameChar}}" alt="Avatar">
-            <div class="review-user-info">
-              <span>{{username}}</span>
-              <span class="review-timestamp">{{createdAt}}</span>
+  .my-reviews-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .my-reviews-controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .my-reviews-controls label {
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+    margin-right: 0.5rem;
+  }
+
+  .my-reviews-controls select {
+    padding: 0.5rem 1rem;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--foreground);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .my-reviews-controls select:focus {
+    outline: none;
+    border-color: var(--spotify-green);
+  }
+
+  .my-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .my-review-item {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    transition: background-color 0.2s;
+  }
+
+  .my-review-item:hover {
+    background: rgba(255,255,255,0.04);
+  }
+
+  .my-review-artwork {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+    border-radius: var(--card-radius);
+    object-fit: cover;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .my-review-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .my-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .my-review-info h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .my-review-info p {
+    font-size: 1rem;
+    color: var(--muted-foreground);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .my-review-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--star);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .my-review-rating .star-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .my-review-date {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    margin-top: 0.25rem;
+  }
+
+  .my-review-text {
+    color: var(--foreground);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  .no-reviews {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--muted-foreground);
+  }
+</style>
+
+<div class="my-reviews-container">
+  <section class="content-section" id="myReviewsSection" data-username="{{username}}">
+    <div class="my-reviews-header">
+      <div>
+        <h2>My Reviews</h2>
+        <p class="section-subtitle">
+          View and manage your song and album reviews
+          {{#if reviews}}
+            <span id="reviewCountDisplay" style="color: var(--muted-foreground); font-size: 0.9rem; margin-left: 0.5rem;">
+              • {{reviews.length}} {{#if (eq reviews.length 1)}}review{{else}}reviews{{/if}} total
+            </span>
+          {{/if}}
+        </p>
+      </div>
+      <!-- Sort and Filter Controls -->
+      <div class="my-reviews-controls">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label for="sortMyReviews">Sort by:</label>
+          <select id="sortMyReviews" name="sortMyReviews">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="rating-high">Rating: High to Low</option>
+            <option value="rating-low">Rating: Low to High</option>
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label for="filterMyRating">Filter by rating:</label>
+          <select id="filterMyRating" name="filterMyRating">
+            <option value="all">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews list -->
+    <div class="my-reviews-list" id="myReviewsList">
+      {{#if reviews}}
+        {{#each reviews}}
+          <a href="/song/{{#if songId}}{{songId}}{{else}}example{{/if}}" style="text-decoration: none; color: inherit;">
+          <div class="my-review-item" 
+               data-rating="{{#if rating}}{{rating}}{{else}}5{{/if}}"
+               data-date="{{#if createdAt}}{{createdAt}}{{else}}{{/if}}"
+               data-timestamp="{{#if timestamp}}{{timestamp}}{{else}}0{{/if}}"
+               style="cursor: pointer;">
+            <img src="{{#if artworkUrl}}{{artworkUrl}}{{else}}https://placehold.co/120x120/1DB954/white?text={{#if songTitle}}{{substr songTitle 0 1}}{{else}}A{{/if}}{{/if}}" 
+                 alt="{{#if songTitle}}{{songTitle}}{{else}}Album Art{{/if}}" 
+                 class="my-review-artwork">
+            <div class="my-review-content">
+              <div class="my-review-header">
+                <div class="my-review-info">
+                  <h3>{{#if songTitle}}{{songTitle}}{{else}}Untitled{{/if}}</h3>
+                  <p>{{#if artist}}{{artist}}{{else}}Unknown Artist{{/if}}</p>
+                  <div class="my-review-date">{{#if createdAt}}{{createdAt}}{{else}}Just now{{/if}}</div>
+                </div>
+                <div class="my-review-rating" style="display: flex; align-items: center; gap: 0.15rem;">
+                  {{#each (range 1 5)}}
+                    {{#if (gte ../rating this)}}
+                      <svg class="star-icon" fill="var(--star)" viewBox="0 0 20 20" style="width: 1.1rem; height: 1.1rem;">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                      </svg>
+                    {{else}}
+                      <svg class="star-icon" fill="var(--muted-foreground)" viewBox="0 0 20 20" style="width: 1.1rem; height: 1.1rem; opacity: 0.3;">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                      </svg>
+                    {{/if}}
+                  {{/each}}
+                </div>
+              </div>
+              {{#if reviewText}}
+              <div class="my-review-text">{{reviewText}}</div>
+              {{/if}}
             </div>
-            <div class="review-user-rating">&nbsp;</div>
           </div>
-          <div class="review-card-body">
-            <p class="review-song-title">{{songTitle}}</p>
-            <p class="review-text">{{reviewText}}</p>
-          </div>
+          </a>
+        {{/each}}
+      {{else}}
+        <div class="no-reviews">
+          <p>You haven't written any reviews yet.</p>
+          <p style="margin-top: 0.5rem;">Start reviewing songs and albums to see them here!</p>
         </div>
-      {{/each}}
-    {{/if}}
-  </div>
-
-  <!-- Client-side Handlebars template for rendering a review -->
-  <script id="review-template" type="text/x-handlebars-template">
-    <div class="review-card-long">
-      <div class="review-card-header">
-        <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text={{usernameChar}}" alt="Avatar">
-        <div class="review-user-info">
-          <span>{{username}}</span>
-          <span class="review-timestamp">{{createdAt}}</span>
-        </div>
-        <div class="review-user-rating">&nbsp;</div>
-      </div>
-      <div class="review-card-body">
-        <p class="review-song-title">{{songTitle}}</p>
-        <p class="review-text">{{reviewText}}</p>
-      </div>
+      {{/if}}
     </div>
-  </script>
 
-</section>
+
+  </section>
+</div>
+
+<script>
+  // Update review count display
+  function updateReviewCount() {
+    const reviewCountDisplay = document.getElementById('reviewCountDisplay');
+    if (!reviewCountDisplay) return;
+    
+    const myReviewsListContainer = document.getElementById('myReviewsList');
+    if (!myReviewsListContainer) return;
+    
+    // Count only visible reviews (not hidden by deletion)
+    const visibleReviews = Array.from(myReviewsListContainer.querySelectorAll('a')).filter(item => {
+      return item.style.display !== 'none';
+    });
+    
+    const count = visibleReviews.length;
+    const reviewText = count === 1 ? 'review' : 'reviews';
+    reviewCountDisplay.textContent = ` • ${count} ${reviewText} total`;
+  }
+  
+  // Filter out deleted reviews on page load
+  function filterDeletedReviews() {
+    try {
+      const deletedReviews = JSON.parse(localStorage.getItem('deletedReviews') || '[]');
+      
+      const myReviewsListContainer = document.getElementById('myReviewsList');
+      if (!myReviewsListContainer) return;
+      
+      const reviewItems = myReviewsListContainer.querySelectorAll('a');
+      let hiddenCount = 0;
+      
+      reviewItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+          // Extract songId from href (e.g., /song/watermelonsugar)
+          const songIdMatch = href.match(/\/song\/([^\/#]+)/);
+          if (songIdMatch && deletedReviews.includes(songIdMatch[1])) {
+            item.style.display = 'none';
+            hiddenCount++;
+          }
+        }
+      });
+      
+      // Update review count after filtering
+      updateReviewCount();
+    } catch (e) {
+      console.error('Error filtering deleted reviews:', e);
+    }
+  }
+  
+  // Run on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', filterDeletedReviews);
+  } else {
+    filterDeletedReviews();
+  }
+
+  // Sort and Filter My Reviews
+  const sortMyReviewsSelect = document.getElementById('sortMyReviews');
+  const filterMyRatingSelect = document.getElementById('filterMyRating');
+  const myReviewsListContainer = document.getElementById('myReviewsList');
+
+  function parseDate(dateString) {
+    if (!dateString || dateString === 'Just now' || dateString.trim() === '') {
+      return new Date();
+    }
+    let date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      const relativeMatch = dateString.match(/(\d+)\s*(h|d|m|w|mo|y)\s*ago/i);
+      if (relativeMatch) {
+        const amount = parseInt(relativeMatch[1]);
+        const unit = relativeMatch[2].toLowerCase();
+        date = new Date();
+        if (unit === 'h') date.setHours(date.getHours() - amount);
+        else if (unit === 'd') date.setDate(date.getDate() - amount);
+        else if (unit === 'm') date.setMinutes(date.getMinutes() - amount);
+        else if (unit === 'w') date.setDate(date.getDate() - (amount * 7));
+        else if (unit === 'mo') date.setMonth(date.getMonth() - amount);
+        else if (unit === 'y') date.setFullYear(date.getFullYear() - amount);
+      } else {
+        date = new Date();
+      }
+    }
+    return date;
+  }
+
+  function sortAndFilterMyReviews() {
+    if (!myReviewsListContainer) return;
+    
+    // Get all review items (anchor tags) each time to ensure fresh data
+    const allReviewItems = Array.from(myReviewsListContainer.querySelectorAll('a'));
+    if (allReviewItems.length === 0) return;
+
+    const sortValue = sortMyReviewsSelect.value;
+    const filterValue = filterMyRatingSelect.value;
+    
+    // Filter reviews by rating
+    let filtered = allReviewItems.filter(anchor => {
+      if (filterValue === 'all') return true;
+      const item = anchor.querySelector('.my-review-item');
+      if (!item) return false;
+      const rating = parseInt(item.dataset.rating || '5');
+      return rating === parseInt(filterValue);
+    });
+
+    // Sort reviews
+    filtered.sort((a, b) => {
+      const itemA = a.querySelector('.my-review-item');
+      const itemB = b.querySelector('.my-review-item');
+      if (!itemA || !itemB) return 0;
+      
+      switch(sortValue) {
+        case 'newest':
+          // Use timestamp if available, otherwise parse date text
+          const timestampA = parseInt(itemA.dataset.timestamp || '0');
+          const timestampB = parseInt(itemB.dataset.timestamp || '0');
+          if (timestampA > 0 && timestampB > 0) {
+            return timestampB - timestampA;
+          }
+          // Fallback to parsing date text
+          const dateA = parseDate(itemA.querySelector('.my-review-date').textContent);
+          const dateB = parseDate(itemB.querySelector('.my-review-date').textContent);
+          return dateB - dateA;
+          
+        case 'oldest':
+          // Use timestamp if available, otherwise parse date text
+          const timestampAOld = parseInt(itemA.dataset.timestamp || '0');
+          const timestampBOld = parseInt(itemB.dataset.timestamp || '0');
+          if (timestampAOld > 0 && timestampBOld > 0) {
+            return timestampAOld - timestampBOld;
+          }
+          // Fallback to parsing date text
+          const dateAOld = parseDate(itemA.querySelector('.my-review-date').textContent);
+          const dateBOld = parseDate(itemB.querySelector('.my-review-date').textContent);
+          return dateAOld - dateBOld;
+          
+        case 'rating-high':
+          const ratingAHigh = parseInt(itemA.dataset.rating || '5');
+          const ratingBHigh = parseInt(itemB.dataset.rating || '5');
+          return ratingBHigh - ratingAHigh;
+          
+        case 'rating-low':
+          const ratingALow = parseInt(itemA.dataset.rating || '5');
+          const ratingBLow = parseInt(itemB.dataset.rating || '5');
+          return ratingALow - ratingBLow;
+          
+        default:
+          return 0;
+      }
+    });
+
+    // Clear container and re-append sorted/filtered items (preserving anchor tags)
+    myReviewsListContainer.innerHTML = '';
+    if (filtered.length === 0) {
+      const noResults = document.createElement('div');
+      noResults.className = 'no-reviews';
+      noResults.innerHTML = '<p>No reviews match your filter criteria.</p>';
+      myReviewsListContainer.appendChild(noResults);
+    } else {
+      filtered.forEach(anchor => myReviewsListContainer.appendChild(anchor));
+    }
+    
+    // Update review count after sorting/filtering
+    updateReviewCount();
+  }
+
+  if (sortMyReviewsSelect) {
+    sortMyReviewsSelect.addEventListener('change', sortAndFilterMyReviews);
+  }
+
+  if (filterMyRatingSelect) {
+    filterMyRatingSelect.addEventListener('change', sortAndFilterMyReviews);
+  }
+
+</script>

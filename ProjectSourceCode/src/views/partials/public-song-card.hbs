@@ -1,5 +1,44 @@
-<div class="album-card content-card" role="listitem">
-    <img src="{{album.images.[0].url}}" alt="{{name}}">
-    <h4>{{name}}</h4>
-    <p class="muted-small">{{artists.[0].name}}</p>
+<div class="album-card content-card" role="listitem" style="position: relative; cursor: pointer;">
+    <a href="/song/{{id}}" style="text-decoration: none; color: inherit; display: block;">
+        {{#if album.images}}
+            {{#if album.images.[0].url}}
+                <img src="{{album.images.[0].url}}" alt="{{#if name}}{{name}}{{else}}Album{{/if}}">
+            {{else}}
+                <img src="https://placehold.co/300x300/1DB954/white?text=Album+Art" alt="{{#if name}}{{name}}{{else}}Album{{/if}}">
+            {{/if}}
+        {{else}}
+            <img src="https://placehold.co/300x300/1DB954/white?text=Album+Art" alt="{{#if name}}{{name}}{{else}}Album{{/if}}">
+        {{/if}}
+        <h4>{{#if name}}{{name}}{{else}}Unknown Album{{/if}}</h4>
+        <p class="muted-small">
+            {{#if artists}}
+                {{#each artists}}
+                    {{#if @first}}{{this.name}}{{else}}, {{this.name}}{{/if}}
+                {{/each}}
+            {{else}}
+                Unknown Artist
+            {{/if}}
+        </p>
+        {{#if album.genres}}
+        <p class="muted-small" style="font-size: 0.7rem; margin-top: 0.25rem;">
+            {{#each album.genres}}
+                {{#if @first}}{{this}}{{else}} • {{this}}{{/if}}
+            {{/each}}
+        </p>
+        {{/if}}
+        <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between; margin-top: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20" style="width: 0.875rem; height: 0.875rem; color: var(--star);">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                </svg>
+                <span style="font-size: 0.85rem;">{{#if averageRating}}{{averageRating}}{{else}}4.5{{/if}}</span>
+            </div>
+            <a href="/song/{{id}}#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/{{id}}#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </a>
+        </div>
+    </a>
 </div>

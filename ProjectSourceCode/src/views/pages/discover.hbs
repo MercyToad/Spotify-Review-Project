@@ -3,7 +3,7 @@
   - Layout:
     - Top: Genre Chips
     - Grid Layout (Left Main / Right Sidebar):
-      - Left: Recommended Songs (Scroll) & New Releases (Scroll, limited)
+      - Left: Recommended Songs (Scroll, limited) & New Releases (Scroll, limited)
       - Right: Trending Hits (Vertical List)
 --}}
 
@@ -17,16 +17,17 @@
       <h3>Browse by Genre</h3>
     </div>
     <div class="genre-row">
-      <span class="genre-tag color-1">Pop</span>
-      <span class="genre-tag color-2">Hip-Hop</span>
-      <span class="genre-tag color-3">Rock</span>
-      <span class="genre-tag color-4">Indie</span>
-      <span class="genre-tag color-5">Electronic</span>
-      <span class="genre-tag color-6">R&B</span>
-      <span class="genre-tag color-1">Country</span>
-      <span class="genre-tag color-2">Jazz</span>
-      <span class="genre-tag color-3">Classical</span>
-      <span class="genre-tag color-4">Metal</span>
+      <!-- Genre tags are visual; they do not navigate anywhere -->
+      <button type="button" class="genre-tag color-1" disabled>Pop</button>
+      <button type="button" class="genre-tag color-2" disabled>Hip-Hop</button>
+      <button type="button" class="genre-tag color-3" disabled>Rock</button>
+      <button type="button" class="genre-tag color-4" disabled>Indie</button>
+      <button type="button" class="genre-tag color-5" disabled>Electronic</button>
+      <button type="button" class="genre-tag color-6" disabled>R&B</button>
+      <button type="button" class="genre-tag color-1" disabled>Country</button>
+      <button type="button" class="genre-tag color-2" disabled>Jazz</button>
+      <button type="button" class="genre-tag color-3" disabled>Classical</button>
+      <button type="button" class="genre-tag color-4" disabled>Metal</button>
     </div>
   </section>
 
@@ -36,222 +37,314 @@
     <!-- LEFT COLUMN: Horizontal Scrollers -->
     <main class="main-content">
       
-      <!-- 2. Recommended Songs (Horizontal Scroll) -->
-      <section class="content-section">
+      <!-- 2. Trending Songs (reuse home Trending Songs selection) -->
+      <section class="content-section discover-top-picks">
         <div class="section-header-row">
-            <h3>Top Picks for You</h3>
+            <h3>Trending Songs</h3>
         </div>
         
         <div class="horizontal-scroll-container">
-            <!-- Card 1 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/f43f5e/white?text=Weeknd" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Blinding Lights</h4>
-                    <p>The Weeknd</p>
-                    <div class="card-footer">
+            <!-- Trending Song 1: As It Was -->
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/example3" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/f97316/white?text=AIW" alt="As It Was Art">
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="scroll-card-info">
+                        <h4>As It Was</h4>
+                        <p>Harry Styles</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.7</span>
+                            <a href="/song/example3#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example3#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Trending Song 2: Blinding Lights -->
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/example1" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/f43f5e/white?text=BL" alt="Blinding Lights Art">
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="scroll-card-info">
+                        <h4>Blinding Lights</h4>
+                        <p>The Weeknd</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 5.0</span>
+                            <a href="/song/example1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example1#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Trending Song 3: Levitating -->
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/example2" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/8b5cf6/white?text=LV" alt="Levitating Art">
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="scroll-card-info">
+                        <h4>Levitating</h4>
+                        <p>Dua Lipa</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
                         <span class="rating-badge">★ 4.5</span>
+                        <a href="/song/example2#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example2#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
-            <!-- Card 2 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/8b5cf6/white?text=Dua" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Levitating</h4>
-                    <p>Dua Lipa</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.7</span>
+
+            <!-- Trending Song 4: Flowers -->
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/example4" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/eab308/white?text=Miley" alt="Flowers Art">
+                        <div class="play-overlay">▶</div>
                     </div>
-                </div>
+                    <div class="scroll-card-info">
+                        <h4>Flowers</h4>
+                        <p>Miley Cyrus</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.6</span>
+                            <a href="/song/example4#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example4#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
             </div>
-            <!-- Card 3 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/06b6d4/white?text=Harry" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>As It Was</h4>
-                    <p>Harry Styles</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.8</span>
+
+            <!-- Trending Song 5: Kill Bill -->
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/example5" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/10b981/white?text=SZA" alt="Kill Bill Art">
+                        <div class="play-overlay">▶</div>
                     </div>
-                </div>
-            </div>
-            <!-- Card 4 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/eab308/white?text=Miley" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Flowers</h4>
-                    <p>Miley Cyrus</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.6</span>
+                    <div class="scroll-card-info">
+                        <h4>Kill Bill</h4>
+                        <p>SZA</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 5.0</span>
+                            <a href="/song/example5#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example5#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- Card 5 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/10b981/white?text=SZA" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Kill Bill</h4>
-                    <p>SZA</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.9</span>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
       </section>
 
       <!-- 3. New Releases (Albums) - Limited to 5 -->
-      <section class="content-section">
+      <section class="content-section discover-new-releases">
         <div class="section-header-row">
             <h3>New Releases</h3>
         </div>
         
         <div class="horizontal-scroll-container">
             <!-- Album 1 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/3b82f6/white?text=AH" alt="Art">
-                </div>
-                <div class="scroll-card-info">
-                    <h4>After Hours</h4>
-                    <p>The Weeknd</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.8</span>
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/album1" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/3b82f6/white?text=AH" alt="Art">
                     </div>
-                </div>
+                    <div class="scroll-card-info">
+                        <h4>After Hours</h4>
+                        <p>The Weeknd</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.8</span>
+                            <a href="/song/album1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album1#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
             </div>
             <!-- Album 2 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/ec4899/white?text=FN" alt="Art">
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Future Nostalgia</h4>
-                    <p>Dua Lipa</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.7</span>
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/album2" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/ec4899/white?text=FN" alt="Art">
                     </div>
-                </div>
+                    <div class="scroll-card-info">
+                        <h4>Future Nostalgia</h4>
+                        <p>Dua Lipa</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.7</span>
+                            <a href="/song/album2#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album2#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
             </div>
             <!-- Album 3 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/8b5cf6/white?text=SOUR" alt="Art">
-                </div>
-                <div class="scroll-card-info">
-                    <h4>SOUR</h4>
-                    <p>Olivia Rodrigo</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.5</span>
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/album3" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/8b5cf6/white?text=SOUR" alt="Art">
                     </div>
-                </div>
+                    <div class="scroll-card-info">
+                        <h4>SOUR</h4>
+                        <p>Olivia Rodrigo</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.5</span>
+                            <a href="/song/album3#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album3#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
             </div>
             <!-- Album 4 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/6366f1/white?text=Mid" alt="Art">
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Midnights</h4>
-                    <p>Taylor Swift</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.6</span>
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/album4" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/6366f1/white?text=Mid" alt="Art">
                     </div>
-                </div>
+                    <div class="scroll-card-info">
+                        <h4>Midnights</h4>
+                        <p>Taylor Swift</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.6</span>
+                            <a href="/song/album4#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album4#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
             </div>
              <!-- Album 5 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/f43f5e/white?text=PH" alt="Art">
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Planet Her</h4>
-                    <p>Doja Cat</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.4</span>
+            <div class="scroll-card" style="position: relative; cursor: pointer;">
+                <a href="/song/album5" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="card-image-wrapper">
+                        <img src="https://placehold.co/300x300/f43f5e/white?text=PH" alt="Art">
                     </div>
-                </div>
+                    <div class="scroll-card-info">
+                        <h4>Planet Her</h4>
+                        <p>Doja Cat</p>
+                        <div class="card-footer" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                            <span class="rating-badge">★ 4.4</span>
+                            <a href="/song/album5#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album5#review';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
       </section>
 
     </main>
 
-    <!-- RIGHT COLUMN: Sidebar (Trending Hits Vertical) -->
+    <!-- RIGHT COLUMN: Sidebar (Highly Rated Vertical) -->
     <aside class="sidebar-content">
       
-      <!-- 4. Trending Hits / Community Highlights -->
+      <!-- 4. Highly Rated / Community Highlights -->
       <section class="sidebar-widget">
-        <h3>Trending Hits</h3>
-        <p class="section-subtitle">Top 5 Community Favorites</p>
+        <h3>Highly Rated</h3>
+        <p class="section-subtitle">Top 5 Highly Rated Songs</p>
         
         <div class="vertical-list">
             <!-- Hit 1 -->
-            <div class="list-item">
+            <a href="/song/antihero" style="text-decoration: none; color: inherit;">
+            <div class="list-item" style="cursor: pointer;">
                 <span class="rank-number">1</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=1" alt="Art">
+                <img src="https://placehold.co/48x48/8b5cf6/white?text=AH" alt="Art">
                 <div class="list-item-info">
                     <h4>Anti-Hero</h4>
                     <p>Taylor Swift</p>
                 </div>
                 <span class="rating-badge">★ 4.5</span>
             </div>
+            </a>
             <!-- Hit 2 -->
-            <div class="list-item">
+            <a href="/song/unholy" style="text-decoration: none; color: inherit;">
+            <div class="list-item" style="cursor: pointer;">
                 <span class="rank-number">2</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=2" alt="Art">
+                <img src="https://placehold.co/48x48/f97316/white?text=UH" alt="Art">
                 <div class="list-item-info">
                     <h4>Unholy</h4>
                     <p>Sam Smith</p>
                 </div>
                 <span class="rating-badge">★ 4.2</span>
             </div>
+            </a>
             <!-- Hit 3 -->
-            <div class="list-item">
+            <a href="/song/richflex" style="text-decoration: none; color: inherit;">
+            <div class="list-item" style="cursor: pointer;">
                 <span class="rank-number">3</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=3" alt="Art">
+                <img src="https://placehold.co/48x48/06b6d4/white?text=RF" alt="Art">
                 <div class="list-item-info">
                     <h4>Rich Flex</h4>
                     <p>Drake</p>
                 </div>
                 <span class="rating-badge">★ 3.8</span>
             </div>
+            </a>
             <!-- Hit 4 -->
-            <div class="list-item">
+            <a href="/song/badhabit" style="text-decoration: none; color: inherit;">
+            <div class="list-item" style="cursor: pointer;">
                 <span class="rank-number">4</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=4" alt="Art">
+                <img src="https://placehold.co/48x48/eab308/white?text=BH" alt="Art">
                 <div class="list-item-info">
                     <h4>Bad Habit</h4>
                     <p>Steve Lacy</p>
                 </div>
                 <span class="rating-badge">★ 4.8</span>
             </div>
+            </a>
             <!-- Hit 5 -->
-            <div class="list-item">
+            <a href="/song/goldenhour" style="text-decoration: none; color: inherit;">
+            <div class="list-item" style="cursor: pointer;">
                 <span class="rank-number">5</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=5" alt="Art">
+                <img src="https://placehold.co/48x48/10b981/white?text=GH" alt="Art">
                 <div class="list-item-info">
                     <h4>Golden Hour</h4>
                     <p>JVKE</p>
                 </div>
                 <span class="rating-badge">★ 4.4</span>
             </div>
+            </a>
         </div>
       </section>
 

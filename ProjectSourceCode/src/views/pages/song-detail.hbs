@@ -1,0 +1,1299 @@
+{{!--
+  Song/Album Detail Page
+  - Shows larger album art on the left
+  - Shows all reviews on the right side
+  - Includes option to add a review
+--}}
+
+<style>
+  .song-detail-container {
+    width: 90%;
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .song-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .song-detail-layout {
+      grid-template-columns: 400px 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .song-art-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .song-art-large {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: var(--card-radius);
+    object-fit: cover;
+    box-shadow: var(--shadow-strong);
+  }
+
+  .song-info {
+    width: 100%;
+  }
+
+  .song-info h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+    line-height: 1.2;
+  }
+
+  .song-info h2 {
+    font-size: 1.5rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .song-info .year-info {
+    font-size: 1.1rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1.5rem;
+  }
+
+  .song-info .rating-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .song-info .rating-display .star-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .star-rating {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .star-rating input[type="radio"],
+  .star-rating-edit input[type="radio"] {
+    display: none;
+  }
+
+  .star-rating label,
+  .star-rating-edit label {
+    font-size: 2rem;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+  }
+
+  .star-rating label:hover,
+  .star-rating-edit label:hover {
+    color: var(--star);
+  }
+
+  .star-rating input[type="radio"]:checked ~ label,
+  .star-rating-edit input[type="radio"]:checked ~ label {
+    color: var(--star);
+  }
+
+  .star-rating input[type="radio"]:checked + label,
+  .star-rating-edit input[type="radio"]:checked + label {
+    color: var(--star);
+  }
+
+  .star-rating:hover label,
+  .star-rating-edit:hover label {
+    color: var(--star);
+  }
+
+  .star-rating input[type="radio"]:checked ~ label,
+  .star-rating:not(:hover) input[type="radio"]:checked ~ label,
+  .star-rating-edit input[type="radio"]:checked ~ label,
+  .star-rating-edit:not(:hover) input[type="radio"]:checked ~ label {
+    color: var(--star);
+  }
+
+  .reviews-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .reviews-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .reviews-controls label {
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+    margin-right: 0.5rem;
+  }
+
+  .reviews-controls select {
+    padding: 0.5rem 1rem;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--foreground);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .reviews-controls select:focus {
+    outline: none;
+    border-color: var(--spotify-green);
+  }
+
+  .reviews-controls select option {
+    background-color: var(--panel);
+    color: var(--foreground);
+  }
+
+  .add-review-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .add-review-card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .reviews-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .reviews-list::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-radius: 3px;
+  }
+
+  .reviews-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .review-item {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 1.25rem;
+    transition: background-color 0.2s;
+  }
+
+  .review-item:hover {
+    background: rgba(255,255,255,0.04);
+  }
+
+  .review-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .review-item-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .review-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .review-item-username {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--foreground);
+    margin-bottom: 0.25rem;
+  }
+
+  .review-item-date {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+  }
+
+  .review-item-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--star);
+    font-weight: 600;
+  }
+
+  .review-item-rating .star-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .review-item-text {
+    color: var(--foreground);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  .review-item.user-review {
+    border-left: 3px solid var(--spotify-green);
+    background: rgba(29, 185, 84, 0.05);
+  }
+</style>
+
+<div class="song-detail-container">
+  <div class="song-detail-layout">
+    
+    <!-- Left: Large Album Art and Info -->
+    <div class="song-art-section">
+      {{#if track.album.images}}
+        {{#if track.album.images.[0].url}}
+          <img src="{{track.album.images.[0].url}}" 
+               alt="{{#if track.name}}{{track.name}}{{else}}Song{{/if}}" 
+               class="song-art-large">
+        {{else}}
+          <img src="https://placehold.co/400x400/1DB954/white?text=Album+Art" 
+               alt="{{#if track.name}}{{track.name}}{{else}}Song{{/if}}" 
+               class="song-art-large">
+        {{/if}}
+      {{else}}
+        <img src="https://placehold.co/400x400/1DB954/white?text=Album+Art" 
+             alt="{{#if track.name}}{{track.name}}{{else}}Song{{/if}}" 
+             class="song-art-large">
+      {{/if}}
+      <div class="song-info">
+        <h1>{{#if track.name}}{{track.name}}{{else}}Song Title{{/if}}</h1>
+        <h2>
+          {{#if track.artists}}
+            {{#each track.artists}}
+              {{#if @first}}{{this.name}}{{else}}, {{this.name}}{{/if}}
+            {{/each}}
+          {{else}}
+            Artist
+          {{/if}}
+        </h2>
+        {{#if track.album.name}}
+        <p class="album-name" style="color: var(--muted-foreground); font-size: 0.9rem; margin-top: 0.25rem;">
+          {{track.album.name}}
+        </p>
+        {{/if}}
+        {{#if releaseYear}}
+        <div class="year-info">{{releaseYear}}</div>
+        {{/if}}
+        {{#if track.album.genres}}
+        <div class="genre-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+          {{#each track.album.genres}}
+            <span class="genre-tag" style="background: rgba(29, 185, 84, 0.1); color: var(--spotify-green); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;">{{this}}</span>
+          {{/each}}
+        </div>
+        {{/if}}
+        {{#if track.duration_ms}}
+        <div class="duration-info" style="color: var(--muted-foreground); font-size: 0.85rem; margin-top: 0.5rem;" data-duration-ms="{{track.duration_ms}}">
+          <!-- Duration will be formatted via JavaScript or backend -->
+        </div>
+        {{/if}}
+        <div class="rating-display" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <div id="starRatingDisplay" style="display: flex; align-items: center; gap: 0.15rem; position: relative;" data-rating="{{#if averageRating}}{{averageRating}}{{else}}0.0{{/if}}">
+            {{#each (range 1 5)}}
+              <div class="star-wrapper" style="position: relative; width: 1.5rem; height: 1.5rem;">
+                <svg class="star-icon star-empty" fill="var(--muted-foreground)" viewBox="0 0 20 20" style="width: 1.5rem; height: 1.5rem; opacity: 0.3; position: absolute;">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                </svg>
+                <svg class="star-icon star-filled" fill="var(--star)" viewBox="0 0 20 20" style="width: 1.5rem; height: 1.5rem; position: absolute; clip-path: inset(0 100% 0 0); transition: clip-path 0.2s; z-index: 1;">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                </svg>
+              </div>
+            {{/each}}
+          </div>
+          <span style="font-weight: 600; font-size: 1.25rem;">{{#if averageRating}}{{averageRating}}{{else}}0.0{{/if}}</span>
+          <span class="review-count" style="color: var(--muted-foreground);">({{#if reviewCount}}{{reviewCount}}{{else}}0{{/if}} reviews)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Reviews Section -->
+    <div class="reviews-section">
+      <!-- Add Review Card (only show if user hasn't reviewed) -->
+      {{#unless userHasReviewed}}
+      <div class="add-review-card" id="review">
+        <h3>Write a Review</h3>
+        <form id="addReviewForm" action="/add-review" method="POST">
+          <input type="hidden" name="songId" value="{{#if track.id}}{{track.id}}{{/if}}">
+          <input type="hidden" name="songTitle" value="{{#if track.name}}{{track.name}}{{/if}}">
+          <input type="hidden" name="artistName" value="{{#if track.artists}}{{track.artists.[0].name}}{{/if}}">
+          <input type="hidden" name="artworkUrl" value="{{#if track.album.images}}{{track.album.images.[0].url}}{{/if}}">
+          <input type="hidden" name="rating" id="ratingInput" required>
+          <div class="form-group">
+            <label>Rating <span style="color: #ef4444;">*</span></label>
+            <div class="star-rating">
+              <input type="radio" id="star1" name="starRating" value="1">
+              <label for="star1">★</label>
+              <input type="radio" id="star2" name="starRating" value="2">
+              <label for="star2">★</label>
+              <input type="radio" id="star3" name="starRating" value="3">
+              <label for="star3">★</label>
+              <input type="radio" id="star4" name="starRating" value="4">
+              <label for="star4">★</label>
+              <input type="radio" id="star5" name="starRating" value="5">
+              <label for="star5">★</label>
+            </div>
+            <small style="color: var(--muted-foreground); display: block; margin-top: 0.5rem;">Click a star to rate (required)</small>
+          </div>
+          <div class="form-group">
+            <label for="reviewText">Your Review <span style="color: var(--muted-foreground); font-weight: normal;">(optional)</span></label>
+            <textarea id="reviewText" name="reviewText" class="form-input" placeholder="Share your thoughts..." rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Submit Review</button>
+        </form>
+      </div>
+      {{/unless}}
+
+      <!-- Reviews List -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 class="section-title" style="margin-bottom: 0;">Popular Reviews</h3>
+        </div>
+        
+        <!-- Sort and Filter Controls -->
+        <div class="reviews-controls">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label for="sortReviews">Sort by:</label>
+            <select id="sortReviews" name="sortReviews">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="rating-high">Rating: High to Low</option>
+              <option value="rating-low">Rating: Low to High</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label for="filterRating">Filter by rating:</label>
+            <select id="filterRating" name="filterRating">
+              <option value="all">All Ratings</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="reviews-list" id="reviewsListContainer">
+        {{#if reviews}}
+          {{#each reviews}}
+            <div class="review-item {{#if isCurrentUser}}user-review{{/if}}" 
+                 data-rating="{{#if rating}}{{rating}}{{else}}5{{/if}}"
+                 data-date="{{#if createdAt}}{{createdAt}}{{else}}{{/if}}"
+                 data-popularity="{{#if likes}}{{likes}}{{else}}0{{/if}}"
+                 data-timestamp="{{#if timestamp}}{{timestamp}}{{else}}0{{/if}}"
+                 data-is-user="{{#if isCurrentUser}}true{{else}}false{{/if}}"
+                 data-review-id="{{@index}}">
+              <div class="review-item-header">
+                <img src="https://placehold.co/48x48/22c55e/white?text={{#if username}}{{substr username 0 1}}{{else}}U{{/if}}" 
+                     alt="Avatar" 
+                     class="review-item-avatar">
+                <div class="review-item-info">
+                  <div class="review-item-username">
+                    {{#if username}}{{username}}{{else}}Anonymous{{/if}}
+                    {{#if isCurrentUser}}<span style="color: var(--spotify-green); font-size: 0.75rem; margin-left: 0.5rem;">(You)</span>{{/if}}
+                    {{#if isEdited}}<span style="color: var(--muted-foreground); font-size: 0.7rem; margin-left: 0.5rem; font-style: italic;">(edited)</span>{{/if}}
+                  </div>
+                  <div class="review-item-date">{{#if createdAt}}{{createdAt}}{{else}}Just now{{/if}}</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+                  <div class="review-item-rating" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.15rem;">
+                      {{#each (range 1 5)}}
+                        {{#if (gte ../rating this)}}
+                          <svg class="star-icon" fill="var(--star)" viewBox="0 0 20 20" style="width: 1rem; height: 1rem;">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                          </svg>
+                        {{else}}
+                          <svg class="star-icon" fill="var(--muted-foreground)" viewBox="0 0 20 20" style="width: 1rem; height: 1rem; opacity: 0.3;">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                          </svg>
+                        {{/if}}
+                      {{/each}}
+                    </div>
+                    <span style="font-weight: 600; color: var(--foreground); font-size: 0.9rem;">{{#if rating}}{{rating}}{{else}}5{{/if}}</span>
+                  </div>
+                  {{#if isCurrentUser}}
+                  <button class="edit-review-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--foreground); padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer;" data-review-index="{{@index}}">Edit</button>
+                  <button class="delete-review-btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer;" data-review-index="{{@index}}" data-song-id="{{#if ../track.id}}{{../track.id}}{{/if}}">Delete</button>
+                  {{/if}}
+                </div>
+              </div>
+              {{#if reviewText}}
+              <div class="review-item-text">{{reviewText}}</div>
+              {{/if}}
+              {{#if isCurrentUser}}
+              <!-- Edit Review Form (hidden by default) -->
+              <div class="edit-review-form" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);" data-review-index="{{@index}}">
+                <form class="edit-review-form-inner">
+                  <input type="hidden" name="songId" value="{{#if ../track.id}}{{../track.id}}{{/if}}">
+                  <input type="hidden" name="reviewIndex" value="{{@index}}">
+                  <input type="hidden" name="rating" id="editRatingInput-{{@index}}" required>
+                  <div class="form-group">
+                    <label>Rating <span style="color: #ef4444;">*</span></label>
+                    <div class="star-rating star-rating-edit">
+                      <input type="radio" id="editStar1-{{@index}}" name="editStarRating" value="1" {{#if (eq rating 1)}}checked{{/if}}>
+                      <label for="editStar1-{{@index}}">★</label>
+                      <input type="radio" id="editStar2-{{@index}}" name="editStarRating" value="2" {{#if (eq rating 2)}}checked{{/if}}>
+                      <label for="editStar2-{{@index}}">★</label>
+                      <input type="radio" id="editStar3-{{@index}}" name="editStarRating" value="3" {{#if (eq rating 3)}}checked{{/if}}>
+                      <label for="editStar3-{{@index}}">★</label>
+                      <input type="radio" id="editStar4-{{@index}}" name="editStarRating" value="4" {{#if (eq rating 4)}}checked{{/if}}>
+                      <label for="editStar4-{{@index}}">★</label>
+                      <input type="radio" id="editStar5-{{@index}}" name="editStarRating" value="5" {{#if (eq rating 5)}}checked{{/if}}>
+                      <label for="editStar5-{{@index}}">★</label>
+                    </div>
+                    <small style="color: var(--muted-foreground); display: block; margin-top: 0.5rem;">Click a star to rate (required)</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="editReviewText-{{@index}}">Your Review <span style="color: var(--muted-foreground); font-weight: normal;">(optional)</span></label>
+                    <textarea id="editReviewText-{{@index}}" name="editReviewText" class="form-input" rows="4">{{reviewText}}</textarea>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">Update Review</button>
+                    <button type="button" class="cancel-edit-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--foreground); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Cancel</button>
+                  </div>
+                </form>
+              </div>
+              {{/if}}
+            </div>
+          {{/each}}
+        {{else}}
+          <div class="review-item">
+            <p style="color: var(--muted-foreground); text-align: center; padding: 2rem 0;">No reviews yet. Be the first to review!</p>
+          </div>
+        {{/if}}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Format duration from milliseconds to MM:SS
+  document.addEventListener('DOMContentLoaded', function() {
+    const durationElements = document.querySelectorAll('[data-duration-ms]');
+    durationElements.forEach(function(el) {
+      const ms = parseInt(el.getAttribute('data-duration-ms'));
+      if (!isNaN(ms)) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const formatted = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+        el.textContent = formatted;
+      }
+    });
+  });
+
+  // Handle star rating selection and visual feedback
+  const starInputs = document.querySelectorAll('input[name="starRating"]');
+  const ratingInput = document.getElementById('ratingInput');
+  const starLabels = document.querySelectorAll('.star-rating label');
+  
+  function updateStarDisplay(selectedValue) {
+    starLabels.forEach((label, index) => {
+      const starNumber = index + 1;
+      if (starNumber <= selectedValue) {
+        label.style.color = 'var(--star)';
+      } else {
+        label.style.color = 'var(--muted-foreground)';
+      }
+    });
+  }
+
+  starInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      ratingInput.value = this.value;
+      updateStarDisplay(parseInt(this.value));
+    });
+  });
+
+  // Hover effect for stars
+  starLabels.forEach((label, index) => {
+    label.addEventListener('mouseenter', function() {
+      const starNumber = index + 1;
+      starLabels.forEach((l, i) => {
+        if (i < starNumber) {
+          l.style.color = 'var(--star)';
+        }
+      });
+    });
+  });
+
+  const starRatingContainer = document.querySelector('.star-rating');
+  if (starRatingContainer) {
+    starRatingContainer.addEventListener('mouseleave', function() {
+      const selectedInput = document.querySelector('input[name="starRating"]:checked');
+      if (selectedInput) {
+        updateStarDisplay(parseInt(selectedInput.value));
+      } else {
+        starLabels.forEach(label => {
+          label.style.color = 'var(--muted-foreground)';
+        });
+      }
+    });
+  }
+
+  // Form validation - ensure rating is selected
+  const reviewForm = document.getElementById('addReviewForm');
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', function(e) {
+      const selectedRating = ratingInput.value;
+      if (!selectedRating || selectedRating === '') {
+        e.preventDefault();
+        alert('Please select a star rating before submitting your review.');
+        return false;
+      }
+
+      // Clear any client-side deleted flag for this song so it can reappear
+      try {
+        const songIdInput = reviewForm.querySelector('input[name="songId"]');
+        const songId = songIdInput ? songIdInput.value : null;
+        if (songId) {
+          const deletedReviews = JSON.parse(localStorage.getItem('deletedReviews') || '[]');
+          const updated = deletedReviews.filter(id => id !== songId);
+          localStorage.setItem('deletedReviews', JSON.stringify(updated));
+        }
+      } catch (err) {
+        console.error('Error clearing deletedReviews for new review:', err);
+      }
+    });
+  }
+
+  // Edit Review Functionality
+  function setupEditButtons() {
+    const editButtons = document.querySelectorAll('.edit-review-btn');
+    editButtons.forEach(btn => {
+      // Remove existing listeners to avoid duplicates
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      
+      newBtn.addEventListener('click', function() {
+        const reviewIndex = this.getAttribute('data-review-index');
+        const reviewItem = this.closest('.review-item');
+        const editForm = reviewItem.querySelector('.edit-review-form');
+        if (!editForm) return;
+        
+        const editStarRating = editForm.querySelectorAll('input[name="editStarRating"]');
+        const editLabels = editForm.querySelectorAll('.star-rating-edit label');
+        const editRatingInput = editForm.querySelector('#editRatingInput-' + reviewIndex);
+        
+        // Show edit form
+        editForm.style.display = 'block';
+        
+        // Get current rating
+        const currentRating = parseInt(reviewItem.getAttribute('data-rating'));
+        
+        // Update star display - ensure correct radio is checked
+        editStarRating.forEach((input) => {
+          if (parseInt(input.value) === currentRating) {
+            input.checked = true;
+            if (editRatingInput) {
+              editRatingInput.value = currentRating;
+            }
+          } else {
+            input.checked = false;
+          }
+        });
+        
+        // Update visual star display initially
+        updateEditStarDisplay(currentRating, editLabels);
+        
+        // Helper function to get current labels
+        const getCurrentLabels = () => editForm.querySelectorAll('.star-rating-edit label');
+        
+        // Handle star rating clicks for edit form - add listeners directly without cloning
+        editStarRating.forEach((input) => {
+          input.addEventListener('change', function() {
+            const selectedRating = parseInt(this.value);
+            if (editRatingInput) {
+              editRatingInput.value = selectedRating;
+            }
+            // Update visual display with current labels
+            const currentLabels = getCurrentLabels();
+            updateEditStarDisplay(selectedRating, currentLabels);
+          });
+        });
+        
+        // Handle hover for edit stars - same as add review form
+        const editStarContainer = editForm.querySelector('.star-rating-edit');
+        if (editStarContainer) {
+          editLabels.forEach((label, index) => {
+            label.addEventListener('mouseenter', function() {
+              const starNumber = index + 1;
+              const currentLabels = getCurrentLabels();
+              currentLabels.forEach((l, i) => {
+                if (i < starNumber) {
+                  l.style.color = 'var(--star)';
+                } else {
+                  l.style.color = 'var(--muted-foreground)';
+                }
+              });
+            });
+          });
+          
+          editStarContainer.addEventListener('mouseleave', function() {
+            const selectedInput = editForm.querySelector('input[name="editStarRating"]:checked');
+            const currentLabels = getCurrentLabels();
+            if (selectedInput) {
+              updateEditStarDisplay(parseInt(selectedInput.value), currentLabels);
+            } else {
+              updateEditStarDisplay(currentRating, currentLabels);
+            }
+          });
+        }
+      });
+    });
+  }
+  
+  // Initialize edit buttons on page load
+  setupEditButtons();
+  
+  function updateEditStarDisplay(selectedValue, labels) {
+    labels.forEach((label, index) => {
+      const starNumber = index + 1;
+      if (starNumber <= selectedValue) {
+        label.style.color = 'var(--star)';
+      } else {
+        label.style.color = 'var(--muted-foreground)';
+      }
+    });
+  }
+  
+  // Cancel edit buttons
+  function setupCancelButtons() {
+    const cancelEditButtons = document.querySelectorAll('.cancel-edit-btn');
+    cancelEditButtons.forEach(btn => {
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', function() {
+        const editForm = this.closest('.edit-review-form');
+        if (editForm) {
+          editForm.style.display = 'none';
+        }
+      });
+    });
+  }
+  
+  setupCancelButtons();
+  
+  // Handle edit form submission
+  function setupEditFormSubmissions() {
+    const editForms = document.querySelectorAll('.edit-review-form-inner');
+    editForms.forEach(form => {
+      const newForm = form.cloneNode(true);
+      form.parentNode.replaceChild(newForm, form);
+      
+      newForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const songId = this.querySelector('input[name="songId"]').value;
+        const reviewIndex = parseInt(this.querySelector('input[name="reviewIndex"]').value);
+        const selectedRatingInput = this.querySelector('input[name="editStarRating"]:checked');
+        const hiddenRatingInput = this.querySelector('input[name="rating"]');
+        
+        // Get rating from checked radio or hidden input
+        let selectedRating;
+        if (selectedRatingInput) {
+          selectedRating = selectedRatingInput.value;
+        } else if (hiddenRatingInput && hiddenRatingInput.value) {
+          selectedRating = hiddenRatingInput.value;
+        } else {
+          alert('Please select a star rating.');
+          return;
+        }
+        
+        const reviewText = this.querySelector('textarea[name="editReviewText"]').value;
+        
+        // Clear any client-side deleted flag for this song before redirect
+        try {
+          if (songId) {
+            const deletedReviews = JSON.parse(localStorage.getItem('deletedReviews') || '[]');
+            const updated = deletedReviews.filter(id => id !== songId);
+            localStorage.setItem('deletedReviews', JSON.stringify(updated));
+          }
+        } catch (err) {
+          console.error('Error clearing deletedReviews on edit:', err);
+        }
+
+        // Update the review via redirect with query params
+        const params = new URLSearchParams({
+          reviewed: 'true',
+          edited: 'true',
+          rating: selectedRating,
+          reviewText: reviewText || ''
+        });
+        
+        window.location.href = `/song/${songId}?${params.toString()}`;
+      });
+    });
+  }
+  
+  setupEditFormSubmissions();
+
+  // Handle delete review buttons
+  function setupDeleteButtons() {
+    const deleteButtons = document.querySelectorAll('.delete-review-btn');
+    deleteButtons.forEach(btn => {
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+          const songId = this.getAttribute('data-song-id');
+          const reviewIndex = parseInt(this.getAttribute('data-review-index'));
+          
+          // Store deleted review in localStorage so my-reviews page can filter it out
+          try {
+            const deletedReviews = JSON.parse(localStorage.getItem('deletedReviews') || '[]');
+            if (!deletedReviews.includes(songId)) {
+              deletedReviews.push(songId);
+              localStorage.setItem('deletedReviews', JSON.stringify(deletedReviews));
+            }
+          } catch (e) {
+            console.error('Error storing deleted review:', e);
+          }
+          
+          // Redirect to song page with delete parameter
+          const params = new URLSearchParams({
+            deleted: 'true'
+          });
+          
+          window.location.href = `/song/${songId}?${params.toString()}`;
+        }
+      });
+    });
+  }
+  
+  setupDeleteButtons();
+
+  // Sort and Filter Reviews
+  let sortSelect = null;
+  let filterSelect = null;
+  let reviewsContainer = null;
+  
+  function initializeSortAndFilter() {
+    sortSelect = document.getElementById('sortReviews');
+    filterSelect = document.getElementById('filterRating');
+    reviewsContainer = document.getElementById('reviewsListContainer');
+    
+    if (!reviewsContainer) return;
+    
+    // Store original reviews HTML on page load 
+    if (!reviewsContainer.dataset.originalReviews) {
+      reviewsContainer.dataset.originalReviews = reviewsContainer.innerHTML;
+    }
+    
+    // Set up event listeners
+    if (sortSelect) {
+      sortSelect.addEventListener('change', sortAndFilterReviews);
+    }
+    
+    if (filterSelect) {
+      filterSelect.addEventListener('change', sortAndFilterReviews);
+    }
+    
+    // Set up distribution bar clicks after filter select is available
+    setTimeout(setupDistributionBarClicks, 100);
+  }
+  
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSortAndFilter);
+  } else {
+    initializeSortAndFilter();
+  }
+
+  function parseDate(dateString) {
+    if (!dateString || dateString === 'Just now' || dateString.trim() === '') {
+      return new Date(); // Current date for "Just now"
+    }
+    // Try to parse various date formats
+    let date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      // Try parsing relative time
+      const relativeMatch = dateString.match(/(\d+)\s*(h|d|m|w|mo|y)\s*ago/i);
+      if (relativeMatch) {
+        const amount = parseInt(relativeMatch[1]);
+        const unit = relativeMatch[2].toLowerCase();
+        date = new Date();
+        if (unit === 'h') date.setHours(date.getHours() - amount);
+        else if (unit === 'd') date.setDate(date.getDate() - amount);
+        else if (unit === 'm') date.setMinutes(date.getMinutes() - amount);
+        else if (unit === 'w') date.setDate(date.getDate() - (amount * 7));
+        else if (unit === 'mo') date.setMonth(date.getMonth() - amount);
+        else if (unit === 'y') date.setFullYear(date.getFullYear() - amount);
+      } else {
+        date = new Date(); // Default to now if can't parse
+      }
+    }
+    return date;
+  }
+
+  function sortAndFilterReviews() {
+    if (!reviewsContainer) return;
+    
+    // Get original reviews HTML
+    const originalHTML = reviewsContainer.dataset.originalReviews || reviewsContainer.innerHTML;
+    if (!originalHTML) return;
+    
+    // Re-fetch all review items from original HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = originalHTML;
+    const allReviewItems = Array.from(tempDiv.querySelectorAll('.review-item'));
+    
+    if (allReviewItems.length === 0) return;
+
+    const sortValue = sortSelect ? sortSelect.value : 'newest';
+    const filterValue = filterSelect ? filterSelect.value : 'all';
+
+    // Filter reviews by rating - ensure we check the actual rating value
+    let filtered = allReviewItems.filter(item => {
+      if (filterValue === 'all') return true;
+      const rating = parseInt(item.dataset.rating || '0');
+      const filterRating = parseInt(filterValue);
+      return rating === filterRating;
+    });
+
+    // Sort reviews - use timestamp for date-based sorting
+    filtered.sort((a, b) => {
+      switch(sortValue) {
+        case 'newest':
+          // Use timestamp if available, otherwise parse date
+          const timestampA = parseInt(a.dataset.timestamp || '0');
+          const timestampB = parseInt(b.dataset.timestamp || '0');
+          if (timestampA > 0 && timestampB > 0) {
+            return timestampB - timestampA; // Newest first (higher timestamp = newer)
+          }
+          // Fallback to date parsing
+          const dateA = parseDate(a.querySelector('.review-item-date').textContent);
+          const dateB = parseDate(b.querySelector('.review-item-date').textContent);
+          return dateB - dateA; // Newest first
+          
+        case 'oldest':
+          const timestampAOld = parseInt(a.dataset.timestamp || '0');
+          const timestampBOld = parseInt(b.dataset.timestamp || '0');
+          if (timestampAOld > 0 && timestampBOld > 0) {
+            return timestampAOld - timestampBOld; // Oldest first (lower timestamp = older)
+          }
+          // Fallback to date parsing
+          const dateAOld = parseDate(a.querySelector('.review-item-date').textContent);
+          const dateBOld = parseDate(b.querySelector('.review-item-date').textContent);
+          return dateAOld - dateBOld; // Oldest first
+          
+        case 'rating-high': {
+          const ratingAHigh = parseInt(a.dataset.rating || '0');
+          const ratingBHigh = parseInt(b.dataset.rating || '0');
+          if (ratingBHigh !== ratingAHigh) {
+            return ratingBHigh - ratingAHigh; // Highest rating first
+          }
+          // Secondary: newest to oldest within the same rating
+          const tsAHigh = parseInt(a.dataset.timestamp || '0');
+          const tsBHigh = parseInt(b.dataset.timestamp || '0');
+          if (tsAHigh > 0 && tsBHigh > 0) {
+            return tsBHigh - tsAHigh;
+          }
+          const dateAHigh = parseDate(a.querySelector('.review-item-date').textContent);
+          const dateBHigh = parseDate(b.querySelector('.review-item-date').textContent);
+          return dateBHigh - dateAHigh;
+        }
+        
+        case 'rating-low': {
+          const ratingALow = parseInt(a.dataset.rating || '0');
+          const ratingBLow = parseInt(b.dataset.rating || '0');
+          if (ratingALow !== ratingBLow) {
+            return ratingALow - ratingBLow; // Lowest rating first
+          }
+          // Secondary: newest to oldest within the same rating
+          const tsALow = parseInt(a.dataset.timestamp || '0');
+          const tsBLow = parseInt(b.dataset.timestamp || '0');
+          if (tsALow > 0 && tsBLow > 0) {
+            return tsBLow - tsALow;
+          }
+          const dateALow = parseDate(a.querySelector('.review-item-date').textContent);
+          const dateBLow = parseDate(b.querySelector('.review-item-date').textContent);
+          return dateBLow - dateALow;
+        }
+          
+        default:
+          // Default to newest
+          const timestampADef = parseInt(a.dataset.timestamp || '0');
+          const timestampBDef = parseInt(b.dataset.timestamp || '0');
+          if (timestampADef > 0 && timestampBDef > 0) {
+            return timestampBDef - timestampADef;
+          }
+          const dateADef = parseDate(a.querySelector('.review-item-date').textContent);
+          const dateBDef = parseDate(b.querySelector('.review-item-date').textContent);
+          return dateBDef - dateADef;
+      }
+    });
+
+    // Ensure current user's review (if present) stays at the top of the
+    // visible list, except when it's filtered out by the star-rating filter.
+    const userReview = filtered.find(item => item.classList.contains('user-review'));
+    if (userReview) {
+      filtered = filtered.filter(item => item !== userReview);
+      filtered.unshift(userReview);
+    }
+
+    // Clear container and re-append sorted/filtered items
+    reviewsContainer.innerHTML = '';
+    if (filtered.length === 0) {
+      const noResults = document.createElement('div');
+      noResults.className = 'review-item';
+      noResults.innerHTML = '<p style="color: var(--muted-foreground); text-align: center; padding: 2rem 0;">No reviews match your filter criteria.</p>';
+      reviewsContainer.appendChild(noResults);
+    } else {
+      filtered.forEach(item => {
+        // Clone the item to avoid issues with moving DOM nodes
+        const clonedItem = item.cloneNode(true);
+        reviewsContainer.appendChild(clonedItem);
+      });
+      
+      // Re-bind edit and delete buttons after re-rendering
+      setupEditButtons();
+      setupDeleteButtons();
+      setupCancelButtons();
+      
+      // Re-bind edit form submissions
+      setupEditFormSubmissions();
+    }
+  }
+  
+  // Function to add new review to top (unless sorted/filtered)
+  function addNewReviewToTop(reviewData) {
+    if (!reviewsContainer) return;
+    
+    const sortValue = sortSelect ? sortSelect.value : 'newest';
+    const filterValue = filterSelect ? filterSelect.value : 'all';
+    
+    // If sort/filter is active, don't auto-add to top - let user see it after page reload
+    if (sortValue !== 'newest' || filterValue !== 'all') {
+      return; // Will be handled by backend after form submission
+    }
+    
+    // Create new review element
+    const newReview = document.createElement('div');
+    newReview.className = 'review-item user-review';
+    newReview.setAttribute('data-rating', reviewData.rating || '5');
+    newReview.setAttribute('data-date', reviewData.createdAt || 'Just now');
+    newReview.setAttribute('data-popularity', '0');
+    newReview.setAttribute('data-timestamp', Date.now().toString());
+    newReview.setAttribute('data-is-user', 'true');
+    
+    const username = '{{username}}' || 'You';
+    const usernameChar = username.charAt(0).toUpperCase();
+    
+    newReview.innerHTML = `
+      <div class="review-item-header">
+        <img src="https://placehold.co/48x48/22c55e/white?text=${usernameChar}" 
+             alt="Avatar" 
+             class="review-item-avatar">
+        <div class="review-item-info">
+          <div class="review-item-username">
+            ${username}
+            <span style="color: var(--spotify-green); font-size: 0.75rem; margin-left: 0.5rem;">(You)</span>
+          </div>
+          <div class="review-item-date">Just now</div>
+        </div>
+        <div class="review-item-rating">
+          <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+          </svg>
+          <span>${reviewData.rating || '5'}</span>
+        </div>
+      </div>
+      ${reviewData.reviewText ? `<div class="review-item-text">${reviewData.reviewText}</div>` : ''}
+    `;
+    
+    // Insert at top
+    reviewsContainer.insertBefore(newReview, reviewsContainer.firstChild);
+  }
+
+  // Update star rating display with partial stars
+  function updateStarRatingDisplay() {
+    const starDisplay = document.getElementById('starRatingDisplay');
+    if (!starDisplay) {
+      console.error('Star display element not found');
+      return;
+    }
+    
+    // Try both getAttribute and dataset
+    const ratingStr = starDisplay.getAttribute('data-rating') || starDisplay.dataset.rating || '0';
+    const rating = parseFloat(ratingStr);
+    
+    console.log('Star rating value:', ratingStr, 'Parsed:', rating);
+    
+    if (isNaN(rating)) {
+      console.log('Invalid rating, not updating stars');
+      return;
+    }
+    
+    // Rating of 0 is valid - will show all empty stars
+    
+    const starWrappers = starDisplay.querySelectorAll('.star-wrapper');
+    console.log('Found star wrappers:', starWrappers.length);
+    
+    if (starWrappers.length === 0) {
+      console.error('No star wrappers found');
+      return;
+    }
+    
+    starWrappers.forEach((wrapper, index) => {
+      const starNumber = index + 1;
+      const filledStar = wrapper.querySelector('.star-filled');
+      if (!filledStar) {
+        console.error('No filled star found for wrapper', starNumber);
+        return;
+      }
+      
+      // Ensure filled star is visible
+      filledStar.style.display = 'block';
+      filledStar.style.visibility = 'visible';
+      filledStar.style.opacity = '1';
+      filledStar.style.position = 'absolute';
+      filledStar.style.zIndex = '1';
+      
+      if (rating >= starNumber) {
+        // Fully filled
+        filledStar.style.clipPath = 'inset(0 0% 0 0)';
+        console.log(`Star ${starNumber}: Fully filled`);
+      } else if (rating > starNumber - 1) {
+        // Partially filled
+        const fillPercent = (rating - (starNumber - 1)) * 100;
+        filledStar.style.clipPath = `inset(0 ${100 - fillPercent}% 0 0)`;
+        console.log(`Star ${starNumber}: Partially filled ${fillPercent}%`);
+      } else {
+        // Empty
+        filledStar.style.clipPath = 'inset(0 100% 0 0)';
+        console.log(`Star ${starNumber}: Empty`);
+      }
+    });
+  }
+  
+  // Update rating distribution bar graph
+  function updateRatingDistribution() {
+    const distributionContainer = document.querySelector('.distribution-bars');
+    if (!distributionContainer) {
+      console.error('Distribution container not found');
+      return;
+    }
+    
+    try {
+      // Get distribution data from server-rendered data
+      let distributionData, percentageData;
+      
+      try {
+        // Get distribution data from server-rendered JSON
+        let distJsonStr = '{{json ratingDistribution}}';
+        let percJsonStr = '{{json ratingPercentages}}';
+        
+        console.log('Raw distJsonStr:', distJsonStr);
+        console.log('Raw percJsonStr:', percJsonStr);
+        
+        // Handle edge cases where json helper might output "null" or invalid JSON
+        if (distJsonStr === 'null' || distJsonStr === 'undefined' || !distJsonStr || distJsonStr.trim() === '') {
+          distJsonStr = '{"1":0,"2":0,"3":0,"4":0,"5":0}';
+        }
+        if (percJsonStr === 'null' || percJsonStr === 'undefined' || !percJsonStr || percJsonStr.trim() === '') {
+          percJsonStr = '{"1":0,"2":0,"3":0,"4":0,"5":0}';
+        }
+        
+        // Parse the JSON strings
+        distributionData = JSON.parse(distJsonStr);
+        percentageData = JSON.parse(percJsonStr);
+        
+        console.log('Parsed distributionData:', distributionData);
+        console.log('Parsed percentageData:', percentageData);
+        console.log('Distribution data type:', typeof distributionData);
+        console.log('Percentage data type:', typeof percentageData);
+      } catch (e) {
+        console.error('Error parsing distribution data:', e, 'distJsonStr:', distJsonStr, 'percJsonStr:', percJsonStr);
+        // Fallback - ensure we have valid data
+        distributionData = {"1":0,"2":0,"3":0,"4":0,"5":0};
+        percentageData = {"1":0,"2":0,"3":0,"4":0,"5":0};
+      }
+      
+      // Update each bar
+      for (let rating = 5; rating >= 1; rating--) {
+        const barFill = distributionContainer.querySelector(`.distribution-bar-fill[data-rating="${rating}"]`);
+        const countSpan = distributionContainer.querySelector(`.distribution-count[data-rating="${rating}"]`);
+        
+        if (barFill && countSpan) {
+          // Handle both string and number keys - try number first, then string
+          let count = distributionData[rating];
+          if (count === undefined) {
+            count = distributionData[String(rating)];
+          }
+          if (count === undefined || count === null) {
+            count = 0;
+          }
+          count = parseInt(count) || 0;
+          
+          let percentage = percentageData[rating];
+          if (percentage === undefined) {
+            percentage = percentageData[String(rating)];
+          }
+          if (percentage === undefined || percentage === null) {
+            percentage = 0;
+          }
+          percentage = parseFloat(percentage) || 0;
+          
+          // Ensure percentage is between 0 and 100
+          if (percentage < 0) percentage = 0;
+          if (percentage > 100) percentage = 100;
+          
+          console.log(`Rating ${rating}: count=${count}, percentage=${percentage}`);
+          console.log(`  - distributionData[${rating}]:`, distributionData[rating], `distributionData["${rating}"]:`, distributionData[String(rating)]);
+          console.log(`  - percentageData[${rating}]:`, percentageData[rating], `percentageData["${rating}"]:`, percentageData[String(rating)]);
+          console.log(`  - barFill found:`, !!barFill, `countSpan found:`, !!countSpan);
+          
+          // Set bar width - ensure it's a valid percentage
+          if (barFill) {
+            barFill.style.width = percentage + '%';
+            barFill.style.display = 'block';
+            barFill.style.visibility = 'visible';
+            barFill.style.minWidth = '0';
+            barFill.style.opacity = '1';
+            console.log(`  - Set barFill width to: ${percentage}%`);
+          }
+          
+          // Update count and percentage text - round percentage for display
+          if (countSpan) {
+            const displayPercentage = Math.round(percentage);
+            countSpan.textContent = `${count} (${displayPercentage}%)`;
+            console.log(`  - Set countSpan text to: ${count} (${displayPercentage}%)`);
+          }
+          
+          // Adjust opacity if count is 0
+          const row = barFill ? barFill.closest('.distribution-bar-row') : null;
+          if (row) {
+            row.style.opacity = count > 0 ? '1' : '0.5';
+          }
+        } else {
+          console.error(`Bar elements not found for rating ${rating}`, { barFill: !!barFill, countSpan: !!countSpan });
+        }
+      }
+    } catch (error) {
+      console.error('Error updating rating distribution:', error);
+    }
+  }
+  
+  // Make distribution bars clickable to filter reviews
+  function setupDistributionBarClicks() {
+    const distributionRows = document.querySelectorAll('.distribution-bar-row');
+    distributionRows.forEach(row => {
+      const rating = row.getAttribute('data-rating');
+      if (!rating) return;
+      
+      // Remove existing listeners by cloning
+      const newRow = row.cloneNode(true);
+      row.parentNode.replaceChild(newRow, row);
+      
+      newRow.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Get filter select element
+        const filterDropdown = document.getElementById('filterRating');
+        if (filterDropdown) {
+          filterDropdown.value = rating;
+          // Trigger change event to update reviews
+          const changeEvent = new Event('change', { bubbles: true });
+          filterDropdown.dispatchEvent(changeEvent);
+        }
+      });
+    });
+  }
+  
+  // Initialize both functions on page load
+  function initializePage() {
+    console.log('Initializing page...');
+    updateStarRatingDisplay();
+    updateRatingDistribution();
+    setupDistributionBarClicks();
+  }
+  
+  // Run on DOMContentLoaded with multiple attempts to ensure elements are ready
+  function tryInitialize() {
+    const starDisplay = document.getElementById('starRatingDisplay');
+    const distributionContainer = document.querySelector('.distribution-bars');
+    
+    if (starDisplay && distributionContainer) {
+      console.log('All elements found, initializing...');
+      initializePage();
+      
+      // Also try updating distribution again after a short delay to ensure it renders
+      setTimeout(() => {
+        updateRatingDistribution();
+      }, 300);
+    } else {
+      console.log('Elements not ready, retrying...', { starDisplay: !!starDisplay, distributionContainer: !!distributionContainer });
+      setTimeout(tryInitialize, 100);
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(tryInitialize, 100);
+    });
+  } else {
+    // DOM already loaded
+    setTimeout(tryInitialize, 100);
+  }
+  
+  // Also update on window load as a fallback
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      updateRatingDistribution();
+      updateStarRatingDisplay();
+    }, 500);
+  });
+</script>
+

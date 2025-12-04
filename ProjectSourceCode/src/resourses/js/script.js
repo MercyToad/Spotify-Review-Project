@@ -113,55 +113,107 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // search function
+  // search function with dropdown suggestions
   const searchForm = document.getElementById('search-form');
   const searchInput = document.getElementById('search-input');
   const dropdown = document.getElementById('search-results-dropdown');
+
+  // Fake songs for search suggestions
+  const fakeSongs = [
+    { name: 'Blinding Lights', artist: 'The Weeknd', id: 'example1' },
+    { name: 'Levitating', artist: 'Dua Lipa', id: 'example2' },
+    { name: 'As It Was', artist: 'Harry Styles', id: 'example3' },
+    { name: 'Watermelon Sugar', artist: 'Harry Styles', id: 'watermelonsugar' },
+    { name: 'Don\'t Start Now', artist: 'Dua Lipa', id: 'dontstartnow' },
+    { name: 'Physical', artist: 'Dua Lipa', id: 'physical' },
+    { name: 'Flowers', artist: 'Miley Cyrus', id: 'example4' },
+    { name: 'Kill Bill', artist: 'SZA', id: 'example5' },
+    { name: 'Anti-Hero', artist: 'Taylor Swift', id: 'antihero' },
+    { name: 'Unholy', artist: 'Sam Smith', id: 'unholy' },
+    { name: 'Rich Flex', artist: 'Drake', id: 'richflex' },
+    { name: 'Bad Habit', artist: 'Steve Lacy', id: 'badhabit' },
+    { name: 'Golden Hour', artist: 'JVKE', id: 'goldenhour' },
+    { name: 'After Hours', artist: 'The Weeknd', id: 'album1' },
+    { name: 'Future Nostalgia', artist: 'Dua Lipa', id: 'album2' },
+    { name: 'SOUR', artist: 'Olivia Rodrigo', id: 'album3' },
+    { name: 'Midnights', artist: 'Taylor Swift', id: 'album4' },
+    { name: 'Planet Her', artist: 'Doja Cat', id: 'album5' }
+  ];
+
+  // Show suggestions as user types
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim().toLowerCase();
+    
+    if (!query) {
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    // Filter songs that match the query (max 3)
+    const matches = fakeSongs.filter(song => 
+      song.name.toLowerCase().includes(query) || 
+      song.artist.toLowerCase().includes(query)
+    ).slice(0, 3);
+
+    dropdown.innerHTML = '';
+    
+    if (matches.length === 0) {
+      dropdown.innerHTML = '<div class="profile-menu-item" style="padding: 0.75rem; color: var(--muted-foreground);">No results found</div>';
+      dropdown.style.display = 'block';
+      return;
+    }
+
+    matches.forEach(song => {
+      const div = document.createElement('div');
+      div.classList.add('profile-menu-item');
+      div.style.cursor = 'pointer';
+      div.innerHTML = `
+        <span style="font-weight: 500;">${song.name}</span>
+        <span style="margin: 0 0.5rem; color: var(--muted-foreground);">•</span>
+        <span style="font-size: 0.9rem; color: var(--muted-foreground);">${song.artist}</span>
+      `;
+      
+      div.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdown.style.display = 'none';
+        window.location.href = `/song/${song.id}`;
+      });
+
+      div.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = 'rgba(29, 185, 84, 0.1)';
+      });
+
+      div.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = 'transparent';
+      });
+
+      dropdown.appendChild(div);
+    });
+
+    dropdown.style.display = 'block';
+  });
 
   searchForm.addEventListener('submit', async (e) => {
       e.preventDefault(); // STOP page reload
       
       const query = searchInput.value.trim();
       if (!query) return;
-      console.log("query" + query);
 
-      try {
-          console.log("hello");
-          const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
-          console.log("goodbye");
-          const results = await response.json();
-          console.log(results);
-          const songs = results.tracks.items;
-          console.log("songs items: " + songs);
+      // If there are suggestions, navigate to first match
+      const matches = fakeSongs.filter(song => 
+        song.name.toLowerCase().includes(query.toLowerCase()) || 
+        song.artist.toLowerCase().includes(query.toLowerCase())
+      );
 
-          dropdown.innerHTML = '';
-          dropdown.style.display = null;
-
-          if (results.length === 0) {
-              dropdown.innerHTML = '<div class="profile-menu-item">No results found</div>';
-              return;
-          }
-
-          songs.forEach(item => {
-              const div = document.createElement('div');
-              div.classList.add('profile-menu-item');
-            
-              div.textContent = item.name; 
-              
-              // div.addEventListener('click', () => {
-              //     window.location.href = `/details/${item.id}`; // Example navigation
-              // });
-
-              dropdown.appendChild(div);
-          });
-
-      } catch (error) {
-          console.error('Error fetching search results:', error);
+      if (matches.length > 0) {
+        window.location.href = `/song/${matches[0].id}`;
       }
   });
 
   document.addEventListener('click', (e) => {
-      if (!searchForm.contains(e.target)) {
+      // Don't close dropdown if clicking inside it (unless it's a menu item which handles its own navigation)
+      if (!searchForm.contains(e.target) && !dropdown.contains(e.target)) {
           dropdown.style.display = "none";
       }
   });
@@ -180,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showAuthModal(view = 'login') {
       if (!authOverlay) return;
       document.body.style.overflow = 'hidden';
+      authOverlay.style.display = 'flex';
       authOverlay.classList.add('active');
       authOverlay.setAttribute('aria-hidden', 'false');
       if (view === 'register') {
@@ -196,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function hideAuthModal() {
       if (!authOverlay) return;
+      authOverlay.style.display = 'none';
       authOverlay.classList.remove('active');
       authOverlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
@@ -204,7 +258,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (openAuthBtn) {
       openAuthBtn.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation(); // Prevent menu from closing before modal opens
         showAuthModal('login');
+        // Close the profile menu after opening modal
+        if (profileMenu) {
+          profileMenu.classList.remove('active');
+          if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
+          profileMenu.setAttribute('aria-hidden', 'true');
+        }
       });
     }
 
@@ -280,9 +341,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const menu = document.getElementById('profileMenu');
       if (menu) {
         menu.innerHTML = `
-          <a href="/profile" class="profile-menu-item" role="menuitem"><span>Profile</span></a>
+          <a href="/profile" class="profile-menu-item" role="menuitem"><span>My Profile</span></a>
           <a href="/my-reviews" class="profile-menu-item" role="menuitem"><span>My Reviews</span></a>
-          <a href="/settings" class="profile-menu-item" role="menuitem"><span>Settings</span></a>
           <hr class="profile-menu-divider" />
           <button id="mockLogout" class="profile-menu-item logout" role="menuitem"><span>Logout</span></button>
         `;

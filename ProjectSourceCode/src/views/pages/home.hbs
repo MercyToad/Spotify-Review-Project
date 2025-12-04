@@ -1,6 +1,6 @@
 {{!--
   Home page template
-  - Shows recommended songs, albums and a right-hand sidebar with widgets.
+  - Shows trending songs, user recent reviews, and a right-hand sidebar for user's highest rated songs.
   - Uses card components (content-card) and the grid `home-grid-layout` to arrange content.
   - This file is rendered into `main.hbs` via the layout system.
 --}}
@@ -11,57 +11,171 @@
   -->
   <main class="main-content">
     
-    <!-- "Recommended for You" Section -->
-    <section class="content-section">
-      <h2>Recommended for You</h2>
-      <p class="section-subtitle">Based on your listening history</p>
-      <div class="content-grid three-col">
-        {{#each songs}}
-          {{> song-card}}
-        {{/each}}
-      </div>
-    </section>
-
-    <!-- "Albums" Section -->
-    <section class="content-section">
-      <h2>Albums</h2>
-      <div class="content-grid three-col">
-        <!-- Album 1 -->
-        <div class="content-card">
-          <img src="https://placehold.co/300x300/0284c7/white?text=Album+Art" alt="Album Art">
-          <h3>After Hours</h3>
-          <p>The Weeknd</p>
-          <div class="card-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.8</span>
-            <span class="review-count">421 reviews</span>
-          </div>
-        </div>
-        <!-- Album 2, etc. -->
-      </div>
-    </section>
-
-    <!-- "Your Recent Reviews" Section -->
-    <section class="content-section">
-      <h2>Your Recent Reviews</h2>
-      <div class="content-grid three-col">
-        <!-- Review Card 1 -->
-        <div class="review-card-long glass-card">
-          <div class="review-card-header">
-            <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text=A" alt="Avatar">
-            <div class="review-user-info">
-              <span>musiclover_23</span>
-              <span class="review-timestamp">2h ago</span>
+    <!-- Trending Songs Section (formerly Albums) -->
+    <section class="content-section home-trending-songs">
+      <h2>Trending Songs</h2>
+      <div class="content-grid four-col">
+        <!-- Trending Song 1 -->
+        <div class="content-card" style="position: relative; cursor: pointer;">
+          <a href="/song/example3" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://placehold.co/300x300/f97316/white?text=AIW" alt="As It Was Album Art">
+            <h3>As It Was</h3>
+            <p>Harry Styles</p>
+            <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+                {{#with (lookup homeSongStats "example3")}}
+                  <span>{{averageRating}}</span>
+                  <span class="review-count">{{reviewCount}} reviews</span>
+                {{else}}
+                  <span>4.7</span>
+                  <span class="review-count">5 reviews</span>
+                {{/with}}
+              </div>
+              <a href="/song/example3#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example3#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </a>
             </div>
-            <div class="review-user-rating">4.5</div>
-          </div>
-          <div class="review-card-body">
-            <p class="review-song-title">Watermelon Sugar</p>
-            <p class="review-song-artist">Harry Styles</p>
-            <p class="review-text">"Such a feel-good track! Perfect for summer vibes..."</p>
-          </div>
+          </a>
         </div>
-        <!-- Review Card 2, etc. -->
+
+        <!-- Trending Song 2 -->
+        <div class="content-card" style="position: relative; cursor: pointer;">
+          <a href="/song/example1" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://placehold.co/300x300/f43f5e/white?text=BL" alt="Blinding Lights Art">
+            <h3>Blinding Lights</h3>
+            <p>The Weeknd</p>
+            <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+                {{#with (lookup homeSongStats "example1")}}
+                  <span>{{averageRating}}</span>
+                  <span class="review-count">{{reviewCount}} reviews</span>
+                {{else}}
+                  <span>5.0</span>
+                  <span class="review-count">5 reviews</span>
+                {{/with}}
+              </div>
+              <a href="/song/example1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example1#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </a>
+            </div>
+          </a>
+        </div>
+
+        <!-- Trending Song 3 -->
+        <div class="content-card" style="position: relative; cursor: pointer;">
+          <a href="/song/example2" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://placehold.co/300x300/8b5cf6/white?text=LV" alt="Levitating Art">
+            <h3>Levitating</h3>
+            <p>Dua Lipa</p>
+            <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+                {{#with (lookup homeSongStats "example2")}}
+                  <span>{{averageRating}}</span>
+                  <span class="review-count">{{reviewCount}} reviews</span>
+                {{else}}
+                  <span>4.5</span>
+                  <span class="review-count">4 reviews</span>
+                {{/with}}
+              </div>
+              <a href="/song/example2#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example2#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </a>
+            </div>
+          </a>
+        </div>
+
+        <!-- Trending Song 4 -->
+        <div class="content-card" style="position: relative; cursor: pointer;">
+          <a href="/song/example4" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://placehold.co/300x300/eab308/white?text=FL" alt="Flowers Art">
+            <h3>Flowers</h3>
+            <p>Miley Cyrus</p>
+            <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+                {{#with (lookup homeSongStats "example4")}}
+                  <span>{{averageRating}}</span>
+                  <span class="review-count">{{reviewCount}} reviews</span>
+                {{else}}
+                  <span>4.6</span>
+                  <span class="review-count">5 reviews</span>
+                {{/with}}
+              </div>
+              <a href="/song/example4#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example4#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </a>
+            </div>
+          </a>
+        </div>
+
+        <!-- Trending Song 5 -->
+        <div class="content-card" style="position: relative; cursor: pointer;">
+          <a href="/song/example5" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://placehold.co/300x300/10b981/white?text=KB" alt="Kill Bill Art">
+            <h3>Kill Bill</h3>
+            <p>SZA</p>
+            <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+                {{#with (lookup homeSongStats "example5")}}
+                  <span>{{averageRating}}</span>
+                  <span class="review-count">{{reviewCount}} reviews</span>
+                {{else}}
+                  <span>4.9</span>
+                  <span class="review-count">5 reviews</span>
+                {{/with}}
+              </div>
+              <a href="/song/example5#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example5#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </a>
+            </div>
+          </a>
+        </div>
+
+        <!-- Trending Song 6 -->
+        <div class="content-card" style="position: relative; cursor: pointer;">
+          <a href="/song/album1" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://placehold.co/300x300/0284c7/white?text=AH" alt="After Hours Art">
+            <h3>After Hours</h3>
+            <p>The Weeknd</p>
+            <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+                {{#with (lookup homeSongStats "album1")}}
+                  <span>{{averageRating}}</span>
+                  <span class="review-count">{{reviewCount}} reviews</span>
+                {{else}}
+                  <span>4.8</span>
+                  <span class="review-count">5 reviews</span>
+                {{/with}}
+              </div>
+              <a href="/song/album1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album1#review';">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </a>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -72,54 +186,86 @@
   -->
   <aside class="sidebar-content">
     
-    <!-- "From Your Playlists" Widget -->
+    <!-- "Your Highest Rated" Widget -->
     <section class="sidebar-widget glass-card">
-      <h3>From Your Playlists</h3>
-      <p class="section-subtitle">Based on "Workout Mix"</p>
-      <ul class="widget-list">
-        <li>
-          <img src="https://placehold.co/48x48/f97316/white?text=DSN" alt="Album Art">
-          <div class="widget-list-info">
-            <span>Don't Start Now</span>
-            <span>Dua Lipa</span>
-          </div>
-          <div class="widget-list-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.6</span>
-          </div>
-        </li>
-        <li>
-          <img src="https://placehold.co/48x48/f97316/white?text=P" alt="Album Art">
-          <div class="widget-list-info">
-            <span>Physical</span>
-            <span>Dua Lipa</span>
-          </div>
-          <div class="widget-list-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.3</span>
-          </div>
-        </li>
-      </ul>
-    </section>
-
-    <!-- "Community Highlights" Widget -->
-    <section class="sidebar-widget glass-card">
-      <h3>Community Highlights</h3>
-      <p class="section-subtitle">Trending Now</p>
-      <ul class="widget-list">
-        <li>
-          <img src="https://placehold.co/48x48/f97316/white?text=AIW" alt="Album Art">
-          <div class="widget-list-info">
-            <span>As It Was</span>
-            <span>Harry Styles</span>
-          </div>
-          <div class="widget-list-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.7</span>
-          </div>
-        </li>
-      </ul>
+      <a href="/my-reviews" style="text-decoration: none; color: inherit;">
+        <h3 style="cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--spotify-green)'" onmouseout="this.style.color='var(--foreground)'">Your Highest Rated</h3>
+      </a>
+      {{#if highestRated}}
+        <ul class="widget-list">
+          {{#each highestRated}}
+          <a href="/song/{{this.songId}}" style="text-decoration: none; color: inherit;">
+          <li style="cursor: pointer;">
+            <img src="{{this.artworkUrl}}" alt="Album Art">
+            <div class="widget-list-info">
+              <span>{{this.title}}</span>
+              <span>{{this.artist}}</span>
+            </div>
+            <div class="widget-list-rating">
+              <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
+              <span>{{this.rating}}</span>
+            </div>
+          </li>
+          </a>
+          {{/each}}
+        </ul>
+      {{else}}
+        <p class="section-subtitle" style="color: var(--muted-foreground);">No reviews yet</p>
+      {{/if}}
     </section>
 
   </aside>
 </div>
+
+<!-- "Your Recent Reviews" Section (aligned with main grid width) -->
+<section class="content-section home-recent-reviews">
+  <h2>Your Recent Reviews</h2>
+  {{#if recentReviews}}
+    <div class="content-grid four-col" id="recentReviewsContainer">
+      {{#each recentReviews}}
+      <a href="/song/{{this.songId}}" class="recent-review-card-link" data-song-id="{{this.songId}}" style="text-decoration: none; color: inherit; display: block; height: 100%;">
+        <div class="review-card-long glass-card" style="cursor: pointer; height: 100%;">
+          <div class="review-card-body" style="padding: 1rem; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; flex-shrink: 0;">
+              <div style="flex: 1; min-width: 0;">
+                <p class="review-song-title" style="margin: 0 0 0.25rem 0; font-weight: 600;">{{this.title}}</p>
+                <p class="review-song-artist" style="margin: 0; color: var(--muted-foreground);">{{this.artist}}</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.15rem; flex-shrink: 0; margin-left: 1rem;">
+                {{#times this.rating}}
+                  <svg class="star-icon" fill="var(--star)" viewBox="0 0 20 20" style="width: 0.875rem; height: 0.875rem;">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                  </svg>
+                {{/times}}
+                {{#times (subtract 5 this.rating)}}
+                  <svg class="star-icon" fill="var(--muted-foreground)" viewBox="0 0 20 20" style="width: 0.875rem; height: 0.875rem; opacity: 0.3;">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path>
+                  </svg>
+                {{/times}}
+              </div>
+            </div>
+            <p class="review-text" style="margin: 0; color: var(--muted-foreground);">"{{this.reviewText}}"</p>
+          </div>
+        </div>
+      </a>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="section-subtitle" style="color: var(--muted-foreground);">No reviews yet</p>
+  {{/if}}
+</section>
+
+<script>
+  // Filter out deleted reviews on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const deletedReviews = JSON.parse(localStorage.getItem('deletedReviews') || '[]');
+    const reviewCards = document.querySelectorAll('.recent-review-card-link');
+    
+    reviewCards.forEach(card => {
+      const songId = card.getAttribute('data-song-id');
+      if (deletedReviews.includes(songId)) {
+        card.style.display = 'none';
+      }
+    });
+  });
+</script>
