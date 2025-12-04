@@ -162,6 +162,8 @@ app.get('/discover', async (req, res) => {
   let genre = req.query.genre ? req.query.genre : 'pop';
   const query = `SELECT * FROM songs INNER JOIN artist on artist.name = songs.artist WHERE (artist.genre = '${genre}') LIMIT 5;`;
   const results = await db.any(query);
+  const topSongsQuery = `SELECT * FROM songs ORDER BY average_rating DESC LIMIT 5`;
+  const topSongsQueryResults = await db.any(topSongsQuery);
   let albumCovers = [];
   for (const i of results) {
     const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
@@ -180,6 +182,7 @@ app.get('/discover', async (req, res) => {
       genre: genre,
       songs: results,
       albumcovers: albumCovers,
+      topsongs: topSongsQueryResults
     });
 });
 
@@ -296,6 +299,8 @@ app.get('/home', async (req, res) => {
     const data = await response.json();
     songs = data.items;
     album = data.items[0].track.album;
+    const query = `SELECT * FROM review ORDER BY created_at DESC LIMIT 1;`;
+    const recentReview = await db.oneOrNone(query);
     // console.log(album);
     // console.log(songs);
   // }
@@ -324,16 +329,26 @@ app.get('/home', async (req, res) => {
     username: username,
     songs: songs,
     album: album,
+    recentreview: recentReview,
   });
 });
 
 // ------------------- Review endpoints ----------------------
 
 app.post('/review', async (req, res) => {
-  console.log("hitting this??");
-  const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.session.user.username}, ${req.body.song_id}, ${req.body.songTitle}, ${req.body.reviewText}, ${req.body.stars}) RETURNING review_id`;
+  console.log(req.body.song_id);
+  console.log(req.session.user.username);
+  const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.body.user_id}, ${req.body.song_id}, '${req.body.songTitle}', '${req.body.reviewText}', ${req.body.stars}) RETURNING review_id;`;
   const review_id = await db.oneOrNone(query);
   console.log(review_id);
+  //update the average rating of the song
+  // do something with the data
+});
+
+app.get('/review/mostRecent', async (req, res) => {
+  const query = `SELECT * FROM review ORDER BY created_at DESC LIMIT 1;`;
+  const mostRecent = await db.oneOrNone(query);
+  res.json(mostRecent);
 });
 
 // Logout

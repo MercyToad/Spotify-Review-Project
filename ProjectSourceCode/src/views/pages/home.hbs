@@ -104,18 +104,17 @@
 
     <!-- "Community Highlights" Widget -->
     <section class="sidebar-widget glass-card">
-      <h3>Community Highlights</h3>
-      <p class="section-subtitle">Trending Now</p>
+      <h3>Recent Reviews</h3>
+      <p class="section-subtitle">See what's up</p>
       <ul class="widget-list">
         <li>
-          <img src="https://placehold.co/48x48/f97316/white?text=AIW" alt="Album Art">
           <div class="widget-list-info">
-            <span>As It Was</span>
-            <span>Harry Styles</span>
+            <span>{{recentreview.title}} by {{recentreview.artist}}</span>
+            <span>{{recentreview.review_text}}</span>
           </div>
           <div class="widget-list-rating">
             <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-            <span>4.7</span>
+            <span>{{recentreview.rating}}</span>
           </div>
         </li>
       </ul>

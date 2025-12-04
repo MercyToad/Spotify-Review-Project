@@ -141,56 +141,9 @@
         <p class="section-subtitle">Top 5 Community Favorites</p>
         
         <div class="vertical-list">
-            <!-- Hit 1 -->
-            <div class="list-item">
-                <span class="rank-number">1</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=1" alt="Art">
-                <div class="list-item-info">
-                    <h4>Anti-Hero</h4>
-                    <p>Taylor Swift</p>
-                </div>
-                <span class="rating-badge">★ 4.5</span>
-            </div>
-            <!-- Hit 2 -->
-            <div class="list-item">
-                <span class="rank-number">2</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=2" alt="Art">
-                <div class="list-item-info">
-                    <h4>Unholy</h4>
-                    <p>Sam Smith</p>
-                </div>
-                <span class="rating-badge">★ 4.2</span>
-            </div>
-            <!-- Hit 3 -->
-            <div class="list-item">
-                <span class="rank-number">3</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=3" alt="Art">
-                <div class="list-item-info">
-                    <h4>Rich Flex</h4>
-                    <p>Drake</p>
-                </div>
-                <span class="rating-badge">★ 3.8</span>
-            </div>
-            <!-- Hit 4 -->
-            <div class="list-item">
-                <span class="rank-number">4</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=4" alt="Art">
-                <div class="list-item-info">
-                    <h4>Bad Habit</h4>
-                    <p>Steve Lacy</p>
-                </div>
-                <span class="rating-badge">★ 4.8</span>
-            </div>
-            <!-- Hit 5 -->
-            <div class="list-item">
-                <span class="rank-number">5</span>
-                <img src="https://placehold.co/48x48/f97316/white?text=5" alt="Art">
-                <div class="list-item-info">
-                    <h4>Golden Hour</h4>
-                    <p>JVKE</p>
-                </div>
-                <span class="rating-badge">★ 4.4</span>
-            </div>
+            {{#each topsongs}}
+                {{> trending-hit-card}}
+            {{/each}}
         </div>
       </section>
 
