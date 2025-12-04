@@ -349,5 +349,48 @@ app.get('/song/:id', (req, res) => {
     track: { id: songId, name: 'Loading Song...' } 
   });
 });
+
+// Creates the endpoint
+app.post('/add-review', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session.user) {
+      return res.status(401).json({ status: 'error', message: 'Not logged in' });
+    }
+
+    // 1. Grab data from frontend
+    // songId here is the SPOTIFY ID (String)
+    const { songId, rating, reviewText, songTitle } = req.body;
+    const userId = req.session.user.id; 
+
+    // 2. Resolve the Song ID
+    // First, check if the song exists in our DB:
+    let songRecord = await db.oneOrNone('SELECT song_id FROM songs WHERE spotify_id = $1', [songId]);
+
+    // If song doesn't exist in our DB yet, create it
+    if (!songRecord) {
+      songRecord = await db.one(
+        'INSERT INTO songs (spotify_id, title) VALUES ($1, $2) RETURNING song_id',
+        [songId, songTitle || 'Unknown Title']
+      );
+    }
+
+    // 3. Insert the Review
+    const insertQuery = `
+      INSERT INTO review (user_id, song_id, rating, review_text, title) 
+      VALUES ($1, $2, $3, $4, $5)
+    `;
+    
+    await db.none(insertQuery, [userId, songRecord.song_id, rating, reviewText, songTitle]);
+
+    // 4. Success
+    res.status(200).json({ status: 'success', message: 'Review saved!' });
+    
+  } catch (error) {
+    console.error('Error saving review:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to save review' });
+  }
+});
+
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
