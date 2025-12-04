@@ -58,14 +58,32 @@ app.use(
   })
 );
 
-// Initialize session variables
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-  })
-);
+// Expose username to views (session-only helper)
+app.use((req, res, next) => {
+  res.locals.username = req.session && req.session.user ? req.session.user.username : null;
+  next();
+});
+
+// Session-only protection middleware: block direct access to private pages
+// without modifying route handlers. Redirects unauthenticated users
+// who try to access `/home` or `/my-reviews` to the login page.
+app.use((req, res, next) => {
+  const protectedPaths = ['/home', '/my-reviews'];
+  if (protectedPaths.includes(req.path) && !(req.session && req.session.user)) {
+    // Do not redirect. Return a 401 with a clear English message.
+    res.status(401).send(`
+      <html>
+        <head><title>Unauthorized</title></head>
+        <body style="font-family: sans-serif; text-align: center; padding: 3rem;">
+          <h1>Unauthorized</h1>
+          <p>You must register or log in to use this feature.</p>
+        </body>
+      </html>
+    `);
+    return;
+  }
+  next();
+});
 
 const bearer_token = `Bearer ${process.env.API_KEY}`;
 
@@ -238,8 +256,14 @@ app.post('/register', async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 10);
-    await db.none('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
-    return res.redirect('/login');
+    // Insert and return the new user's id and username so we can log them in immediately
+    const newUser = await db.one('INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING user_id, username', [username, hash]);
+
+    // Set session and redirect to private home
+    req.session.user = { id: newUser.user_id, username: newUser.username };
+    req.session.save(() => {
+      return res.redirect('/home');
+    });
   } catch (error) {
     console.error('Registration error:', error);
     return res.status(500).render('pages/register', {
