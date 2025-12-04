@@ -17,16 +17,16 @@
       <h3>Browse by Genre</h3>
     </div>
     <div class="genre-row">
-      <span class="genre-tag color-1">Pop</span>
-      <span class="genre-tag color-2">Hip-Hop</span>
-      <span class="genre-tag color-3">Rock</span>
-      <span class="genre-tag color-4">Indie</span>
-      <span class="genre-tag color-5">Electronic</span>
-      <span class="genre-tag color-6">R&B</span>
-      <span class="genre-tag color-1">Country</span>
-      <span class="genre-tag color-2">Jazz</span>
-      <span class="genre-tag color-3">Classical</span>
-      <span class="genre-tag color-4">Metal</span>
+    <span class="genre-tag color-1" onclick="window.location.href='/discover?genre=pop'">Pop</span>
+      <span class="genre-tag color-2" onclick="window.location.href='/discover?genre=hip-hop'">Hip-Hop</span>
+      <span class="genre-tag color-3" onclick="window.location.href='/discover?genre=rock'">Rock</span>
+      <span class="genre-tag color-4" onclick="window.location.href='/discover?genre=indie'">Indie</span>
+      <span class="genre-tag color-5" onclick="window.location.href='/discover?genre=electronic'">Electronic</span>
+      <span class="genre-tag color-6" onclick="window.location.href='/discover?genre=rnb'">R&B</span>
+      <span class="genre-tag color-1" onclick="window.location.href='/discover?genre=country'">Country</span>
+      <span class="genre-tag color-2" onclick="window.location.href='/discover?genre=jazz'">Jazz</span>
+      <span class="genre-tag color-3" onclick="window.location.href='/discover?genre=classical'">Classical</span>
+      <span class="genre-tag color-4" onclick="window.location.href='/discover?genre=metal'">Metal</span>
     </div>
   </section>
 
@@ -39,80 +39,19 @@
       <!-- 2. Recommended Songs (Horizontal Scroll) -->
       <section class="content-section">
         <div class="section-header-row">
-            <h3>Top Picks for You</h3>
+            <h3>Top {{genre}} Picks for You</h3>
         </div>
         
         <div class="horizontal-scroll-container">
-            <!-- Card 1 -->
-            <div class="scroll-card">
+            {{#each songs}}
+            <div onclick="window.location.href = `/my-reviews?song_id={{spotify_id}}`"class="scroll-card">
                 <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/f43f5e/white?text=Weeknd" alt="Art">
+                    <img src="{{lookup ../albumcovers @index}}" alt="Art">
                     <div class="play-overlay">▶</div>
                 </div>
-                <div class="scroll-card-info">
-                    <h4>Blinding Lights</h4>
-                    <p>The Weeknd</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.5</span>
-                    </div>
-                </div>
+                {{> genre-song-card}}
             </div>
-            <!-- Card 2 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/8b5cf6/white?text=Dua" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Levitating</h4>
-                    <p>Dua Lipa</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.7</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/06b6d4/white?text=Harry" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>As It Was</h4>
-                    <p>Harry Styles</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.8</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Card 4 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/eab308/white?text=Miley" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Flowers</h4>
-                    <p>Miley Cyrus</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.6</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Card 5 -->
-            <div class="scroll-card">
-                <div class="card-image-wrapper">
-                    <img src="https://placehold.co/300x300/10b981/white?text=SZA" alt="Art">
-                    <div class="play-overlay">▶</div>
-                </div>
-                <div class="scroll-card-info">
-                    <h4>Kill Bill</h4>
-                    <p>SZA</p>
-                    <div class="card-footer">
-                        <span class="rating-badge">★ 4.9</span>
-                    </div>
-                </div>
-            </div>
+            {{/each}}
         </div>
       </section>
 

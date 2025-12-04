@@ -139,8 +139,28 @@ app.get('/login', (req, res) => {
 });
 
 // Discover Page
-app.get('/discover', (req, res) => {
-  res.render('pages/discover');
+app.get('/discover', async (req, res) => {
+  let genre = req.query.genre ? req.query.genre : 'pop';
+  const query = `SELECT * FROM songs INNER JOIN artist on artist.name = songs.artist WHERE (artist.genre = '${genre}') LIMIT 5;`;
+  const results = await db.any(query);
+  let albumCovers = [];
+  for (const i of results) {
+    const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
+    method: 'GET',
+    headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': bearer_token,
+    },
+    });
+    const data = await response.json();
+    albumCovers.push(data.album.images[0].url);
+    
+  }
+  res.render('pages/discover', {
+      genre: genre,
+      songs: results,
+      albumcovers: albumCovers,
+    });
 });
 
 // Settings Page
@@ -249,6 +269,8 @@ app.get('/home', async (req, res) => {
     });
     const data = await response.json();
     songs = data.items;
+    album = data.items[0].track.album;
+    // console.log(album);
     // console.log(songs);
   }
   else {
@@ -275,6 +297,7 @@ app.get('/home', async (req, res) => {
     layout: 'main',
     username: username,
     songs: songs,
+    album: album,
   });
 });
 

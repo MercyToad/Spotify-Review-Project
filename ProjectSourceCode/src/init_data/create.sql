@@ -17,7 +17,7 @@ CREATE TABLE artist (
     name VARCHAR(255) NOT NULL,
     spotify_url TEXT,
     image_url TEXT,
-    genres TEXT[]
+    genre TEXT
 );
 
 -- SONGS TABLE

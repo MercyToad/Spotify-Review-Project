@@ -123,16 +123,16 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const query = searchInput.value.trim();
       if (!query) return;
-      console.log("query" + query);
+      // console.log("query" + query);
 
       try {
-          console.log("hello");
+          // console.log("hello");
           const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
-          console.log("goodbye");
+          // console.log("goodbye");
           const results = await response.json();
-          console.log(results);
+          // console.log(results);
           const songs = results.tracks.items;
-          console.log("songs items: " + songs);
+          // console.log("songs items: " + songs);
 
           dropdown.innerHTML = '';
           dropdown.style.display = null;
