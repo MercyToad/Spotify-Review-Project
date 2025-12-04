@@ -335,12 +335,13 @@ app.get('/home', async (req, res) => {
 
 // ------------------- Review endpoints ----------------------
 
-app.post('/review', async (req, res) => {
-  console.log(req.body.song_id);
-  console.log(req.session.user.username);
-  const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.body.user_id}, ${req.body.song_id}, '${req.body.songTitle}', '${req.body.reviewText}', ${req.body.stars}) RETURNING review_id;`;
-  const review_id = await db.oneOrNone(query);
-  console.log(review_id);
+app.post('/review', (req, res) => {
+  res.status(200).json({ status: 'success', message: 'Welcome!' });
+  // console.log(req.body.song_id);
+  // console.log(req.session.user.username);
+  // const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.body.user_id}, ${req.body.song_id}, '${req.body.songTitle}', '${req.body.reviewText}', ${req.body.stars}) RETURNING review_id;`;
+  // const review_id = await db.oneOrNone(query);
+  // console.log(review_id);
   //update the average rating of the song
   // do something with the data
 });
