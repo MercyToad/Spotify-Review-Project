@@ -203,6 +203,18 @@ input, button, textarea {
   overflow-y: auto;
 }
 
+.search-container {
+    position: relative;
+}
+
+.dropdown-content2 { 
+  position: absolute;
+  top: 50%; 
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+}
+
 /* Profile Icon & Container */
 .header-profile-container {
   position: relative;

@@ -18,12 +18,18 @@
 
   <!-- Review form (hidden by default) -->
   <div id="reviewFormContainer" class="review-form" style="{{display}} margin-top:1rem;">
-    <form id="reviewForm">
-      <input type="hidden" id="song-id-input" name="song_id" value="{{song_id}}"> <!-- hidden input so i can send the id too so its not like a triple query-->
-      <div class="form-group">
+    <form id="search-form2">
+      <div class="form-group search-container">
         <label for="songTitle">Song Title</label>
-        <input id="songTitle" name="songTitle" class="form-input" placeholder="Enter song title" value="{{song_name}}" required />
+        <input id="search-input2" class="form-input" placeholder="Enter song title"  value="{{song_name}}" required />
+        <div id="search-results-dropdown2" class="profile-menu active dropdown-content" style="display:none">
+
+        </div>
       </div>
+    </form>
+    <form id="reviewForm" action="/review" method="POST">
+      <input type="hidden" id="song-id-input" name="song_id" value="{{song_id}}"> <!-- hidden input so i can send the id too so its not like a triple query-->
+      <input type="hidden" id="songTitle" name="songTitle" value="{{song_name}}"/>
       <div class="form-group">
         <label for="reviewText">Review</label>
         <textarea id="reviewText" name="reviewText" class="form-input" placeholder="Write your review" rows="4" required></textarea>
@@ -36,6 +42,11 @@
         <span onclick="fillStars(5)" class="review-star-empty star">★</span>
         <input type="hidden" id="star-input" name="stars">
     </div>
+    <div style="display:flex;gap:0.5rem;">
+        <button type="submit" class="btn-primary">Add</button>
+        <button type="button" id="cancelReviewBtn" class="btn-secondary">Cancel</button>
+      </div>
+    </form>
     <script> // note: star output adapted from https://www.geeksforgeeks.org/javascript/star-rating-using-html-css-and-javascript/
       let stars = document.getElementsByClassName("star");
       let input = document.getElementById("star-input");
@@ -51,11 +62,6 @@
         input.value = n;
       }
     </script>
-      <div style="display:flex;gap:0.5rem;">
-        <button type="submit" class="btn-primary">Add</button>
-        <button type="button" id="cancelReviewBtn" class="btn-secondary">Cancel</button>
-      </div>
-    </form>
   </div>
 
   <!-- Reviews list -->

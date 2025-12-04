@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   searchForm.addEventListener('submit', async (e) => {
       e.preventDefault(); // STOP page reload
+      console.log("hitting this");
       
       const query = searchInput.value.trim();
       if (!query) return;
@@ -161,6 +162,59 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!searchForm || !dropdown) return;
       if (!searchForm.contains(e.target)) {
         dropdown.style.display = "none";
+      }
+    });
+
+
+    //second version for reviews page #lazy
+  const searchForm2 = document.getElementById('search-form2');
+  const searchInput2 = document.getElementById('search-input2');
+  const dropdown2 = document.getElementById('search-results-dropdown2');
+
+  searchForm2.addEventListener('submit', async (e) => {
+      e.preventDefault(); // STOP page reload
+      console.log("hitting this");
+      
+      const query = searchInput2.value.trim();
+      if (!query) return;
+      try {
+          // console.log("hello");
+          const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
+          // console.log("goodbye");
+          const results = await response.json();
+          // console.log(results);
+          const songs = results.tracks.items;
+          // console.log("songs items: " + songs);
+
+        if (!dropdown2) return;
+        dropdown2.innerHTML = '';
+        dropdown2.style.display = null;
+
+        if (!songs || songs.length === 0) {
+        dropdown2.innerHTML = '<div class="profile-menu-item">No results found</div>';
+        return;
+        }
+
+        songs.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('profile-menu-item');
+        div.textContent = "'" + item.name + "' by " + (item.artists && item.artists[0] ? item.artists[0].name : 'Unknown');
+
+        div.addEventListener('click', () => {
+          window.location.href = `/my-reviews?song_id=${item.id}`;
+        });
+
+        dropdown2.appendChild(div);
+        });
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      }
+  });
+
+    document.addEventListener('click', (e) => {
+      if (!searchForm2 || !dropdown2) return;
+      if (!searchForm2.contains(e.target)) {
+        dropdown2.style.display = "none";
       }
     });
 

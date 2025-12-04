@@ -238,7 +238,7 @@ app.get('/register', (req, res) => {
 // Register Page POST
 app.post('/register', async (req, res) => {
   const { username, password } = req.body || {};
-
+  console.log(req.body);
   if (!username || !password) {
     return res.status(400).render('pages/register', {
       layout: 'auth',
@@ -262,7 +262,7 @@ app.post('/register', async (req, res) => {
     // Set session and redirect to private home
     req.session.user = { id: newUser.user_id, username: newUser.username };
     req.session.save(() => {
-      return res.redirect('/home');
+      return res.redirect('/login');
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -325,6 +325,15 @@ app.get('/home', async (req, res) => {
     songs: songs,
     album: album,
   });
+});
+
+// ------------------- Review endpoints ----------------------
+
+app.post('/review', async (req, res) => {
+  console.log("hitting this??");
+  const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.session.user.username}, ${req.body.song_id}, ${req.body.songTitle}, ${req.body.reviewText}, ${req.body.stars}) RETURNING review_id`;
+  const review_id = await db.oneOrNone(query);
+  console.log(review_id);
 });
 
 // Logout
