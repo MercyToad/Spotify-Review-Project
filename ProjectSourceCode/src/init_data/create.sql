@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS  users (
     user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(50) NOT NULL, -- we can add spotify id later if we have time?
+    password_hash VARCHAR(150) NOT NULL, -- we can add spotify id later if we have time?
     created_at TIMESTAMP DEFAULT NOW()
 );
 

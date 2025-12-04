@@ -7,7 +7,7 @@
       - Right: Trending Hits (Vertical List)
 --}}
 
-<div class="discover-container">
+<div data-username="{{username}}" class="discover-container">
   
   <!-- 
     1. Genre Selection (Full Width Top)
@@ -44,7 +44,7 @@
         
         <div class="horizontal-scroll-container">
             {{#each songs}}
-            <div onclick="window.location.href = `/my-reviews?song_id={{spotify_id}}`"class="scroll-card">
+            <div onclick="window.location.href = `/my-reviews?song_id={{spotify_id}}`" class="scroll-card">
                 <div class="card-image-wrapper">
                     <img src="{{lookup ../albumcovers @index}}" alt="Art">
                     <div class="play-overlay">▶</div>

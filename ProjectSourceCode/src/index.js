@@ -77,7 +77,7 @@ app.use(
 
 // Root route — serve public landing page
 app.get('/', async (req, res) => {
-  const username = req.session && req.session.user ? req.session.user.username : null;
+  const username = req.session && req.session.user ? req.session.user.username : 'Guest';
   const query = 'SELECT spotify_id FROM songs ORDER BY average_rating DESC LIMIT 7'
     const song_ids = await db.any(query);
     songs = [];
@@ -140,6 +140,7 @@ app.get('/login', (req, res) => {
 
 // Discover Page
 app.get('/discover', async (req, res) => {
+  const username = req.session && req.session.user ? req.session.user.username : 'Guest';
   let genre = req.query.genre ? req.query.genre : 'pop';
   const query = `SELECT * FROM songs INNER JOIN artist on artist.name = songs.artist WHERE (artist.genre = '${genre}') LIMIT 5;`;
   const results = await db.any(query);
@@ -157,6 +158,7 @@ app.get('/discover', async (req, res) => {
     
   }
   res.render('pages/discover', {
+      username: username,
       genre: genre,
       songs: results,
       albumcovers: albumCovers,
@@ -180,7 +182,7 @@ app.post('/login', async (req, res) => {
   }
 
   try {
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
 
     if (!user) {
       return res.status(401).render('pages/login', {
@@ -227,7 +229,7 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
     if (existingUser) {
       return res.status(409).render('pages/register', {
         layout: 'auth',
@@ -257,9 +259,9 @@ const auth = (req, res, next) => {
 
 // Home Page. If a user is logged in we pass the username, otherwise render public home.
 app.get('/home', async (req, res) => {
-  const username = req.session && req.session.user ? req.session.user.username : null;
+  const username = req.session && req.session.user ? req.session.user.username : 'Guest';
   let songs;
-  if (!username) {
+  // if (!username) {
     const response = await fetch('https://api.spotify.com/v1/playlists/34NbomaTu7YuOYnky8nLXL/tracks?limit=3', { //hard coded top 50 playlist cuz i cant access official spotify one. unsure if this will ever change
     method: 'GET',
     headers: {
@@ -272,27 +274,27 @@ app.get('/home', async (req, res) => {
     album = data.items[0].track.album;
     // console.log(album);
     // console.log(songs);
-  }
-  else {
-    // const songs_query = `SELECT song_id, user_id, rating FROM reviews WHERE user_id='${}' ORDER BY rating DESC LIMIT 1;`
-    // const songs = await db.any(songs_query);
-    // const users_query = `SELECT user_id FROM reviews WHERE song_id = ${} ORDER BY average_rating DESC LIMIT 1;`
-    // const users = await db.any(users_query);
-    // const rec_songs_query = `SELECT song_id FROM reviews WHERE song_id != ${} AND user_id = ${} ORDER BY average_rating DESC LIMIT 1;`
-    // const rec_songs = await db.any(rec_songs_query);
-    songs = [];
-    for (const i of song_ids) {
-      const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': bearer_token,
-      },
-      });
-      const data = await response.json();
-      songs.push(data);
-    }
-  }
+  // }
+  // else {
+  //   const songs_query = `SELECT song_id, user_id, rating FROM reviews WHERE user_id='${}' ORDER BY rating DESC LIMIT 1;`
+  //   const songs = await db.any(songs_query);
+  //   const users_query = `SELECT user_id FROM reviews WHERE song_id = ${} ORDER BY average_rating DESC LIMIT 1;`
+  //   const users = await db.any(users_query);
+  //   const rec_songs_query = `SELECT song_id FROM reviews WHERE song_id != ${} AND user_id = ${} ORDER BY average_rating DESC LIMIT 1;`
+  //   const rec_songs = await db.any(rec_songs_query);
+  //   songs = [];
+  //   for (const i of song_ids) {
+  //     const response = await fetch(`https://api.spotify.com/v1/tracks/${i.spotify_id}`, { 
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //       'Authorization': bearer_token,
+  //     },
+  //     });
+  //     const data = await response.json();
+  //     songs.push(data);
+  //   }
+  // }
   return res.render('pages/home', {
     layout: 'main',
     username: username,
