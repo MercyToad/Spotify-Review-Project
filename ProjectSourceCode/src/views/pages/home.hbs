@@ -6,25 +6,20 @@
 --}}
 
 <div class="home-grid-layout">
-  <!-- 
-    MAIN CONTENT COLUMN (Left)
-  -->
   <main class="main-content">
     
-    <!-- Trending Songs Section (formerly Albums) -->
     <section class="content-section home-trending-songs">
       <h2>Trending Songs</h2>
       <div class="content-grid four-col">
-        <!-- Trending Song 1 -->
         <div class="content-card" style="position: relative; cursor: pointer;">
-          <a href="/song/example3" style="text-decoration: none; color: inherit; display: block;">
+          <a href="/song/1" style="text-decoration: none; color: inherit; display: block;">
             <img src="https://placehold.co/300x300/f97316/white?text=AIW" alt="As It Was Album Art">
             <h3>As It Was</h3>
             <p>Harry Styles</p>
             <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-                {{#with (lookup homeSongStats "example3")}}
+                {{#with (lookup homeSongStats "1")}}
                   <span>{{averageRating}}</span>
                   <span class="review-count">{{reviewCount}} reviews</span>
                 {{else}}
@@ -32,7 +27,7 @@
                   <span class="review-count">5 reviews</span>
                 {{/with}}
               </div>
-              <a href="/song/example3#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example3#review';">
+              <a href="/song/1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/1#review';">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -42,16 +37,15 @@
           </a>
         </div>
 
-        <!-- Trending Song 2 -->
         <div class="content-card" style="position: relative; cursor: pointer;">
-          <a href="/song/example1" style="text-decoration: none; color: inherit; display: block;">
+          <a href="/song/2" style="text-decoration: none; color: inherit; display: block;">
             <img src="https://placehold.co/300x300/f43f5e/white?text=BL" alt="Blinding Lights Art">
             <h3>Blinding Lights</h3>
             <p>The Weeknd</p>
             <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-                {{#with (lookup homeSongStats "example1")}}
+                {{#with (lookup homeSongStats "2")}}
                   <span>{{averageRating}}</span>
                   <span class="review-count">{{reviewCount}} reviews</span>
                 {{else}}
@@ -59,7 +53,7 @@
                   <span class="review-count">5 reviews</span>
                 {{/with}}
               </div>
-              <a href="/song/example1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example1#review';">
+              <a href="/song/2#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/2#review';">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -69,16 +63,15 @@
           </a>
         </div>
 
-        <!-- Trending Song 3 -->
         <div class="content-card" style="position: relative; cursor: pointer;">
-          <a href="/song/example2" style="text-decoration: none; color: inherit; display: block;">
+          <a href="/song/3" style="text-decoration: none; color: inherit; display: block;">
             <img src="https://placehold.co/300x300/8b5cf6/white?text=LV" alt="Levitating Art">
             <h3>Levitating</h3>
             <p>Dua Lipa</p>
             <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-                {{#with (lookup homeSongStats "example2")}}
+                {{#with (lookup homeSongStats "3")}}
                   <span>{{averageRating}}</span>
                   <span class="review-count">{{reviewCount}} reviews</span>
                 {{else}}
@@ -86,7 +79,7 @@
                   <span class="review-count">4 reviews</span>
                 {{/with}}
               </div>
-              <a href="/song/example2#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example2#review';">
+              <a href="/song/3#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/3#review';">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -96,16 +89,15 @@
           </a>
         </div>
 
-        <!-- Trending Song 4 -->
         <div class="content-card" style="position: relative; cursor: pointer;">
-          <a href="/song/example4" style="text-decoration: none; color: inherit; display: block;">
+          <a href="/song/4" style="text-decoration: none; color: inherit; display: block;">
             <img src="https://placehold.co/300x300/eab308/white?text=FL" alt="Flowers Art">
             <h3>Flowers</h3>
             <p>Miley Cyrus</p>
             <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-                {{#with (lookup homeSongStats "example4")}}
+                {{#with (lookup homeSongStats "4")}}
                   <span>{{averageRating}}</span>
                   <span class="review-count">{{reviewCount}} reviews</span>
                 {{else}}
@@ -113,7 +105,7 @@
                   <span class="review-count">5 reviews</span>
                 {{/with}}
               </div>
-              <a href="/song/example4#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example4#review';">
+              <a href="/song/4#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/4#review';">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -123,16 +115,15 @@
           </a>
         </div>
 
-        <!-- Trending Song 5 -->
         <div class="content-card" style="position: relative; cursor: pointer;">
-          <a href="/song/example5" style="text-decoration: none; color: inherit; display: block;">
+          <a href="/song/5" style="text-decoration: none; color: inherit; display: block;">
             <img src="https://placehold.co/300x300/10b981/white?text=KB" alt="Kill Bill Art">
             <h3>Kill Bill</h3>
             <p>SZA</p>
             <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-                {{#with (lookup homeSongStats "example5")}}
+                {{#with (lookup homeSongStats "5")}}
                   <span>{{averageRating}}</span>
                   <span class="review-count">{{reviewCount}} reviews</span>
                 {{else}}
@@ -140,7 +131,7 @@
                   <span class="review-count">5 reviews</span>
                 {{/with}}
               </div>
-              <a href="/song/example5#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/example5#review';">
+              <a href="/song/5#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/5#review';">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -150,16 +141,15 @@
           </a>
         </div>
 
-        <!-- Trending Song 6 -->
         <div class="content-card" style="position: relative; cursor: pointer;">
-          <a href="/song/album1" style="text-decoration: none; color: inherit; display: block;">
+          <a href="/song/6" style="text-decoration: none; color: inherit; display: block;">
             <img src="https://placehold.co/300x300/0284c7/white?text=AH" alt="After Hours Art">
             <h3>After Hours</h3>
             <p>The Weeknd</p>
             <div class="card-rating" style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.172c.969 0 1.371 1.24.588 1.81l-3.376 2.45a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.376-2.45a1 1 0 00-1.175 0l-3.376 2.45c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.24 9.397c-.783-.57-.38-1.81.588-1.81h4.172a1 1 0 00.95-.69l1.286-3.97z"></path></svg>
-                {{#with (lookup homeSongStats "album1")}}
+                {{#with (lookup homeSongStats "6")}}
                   <span>{{averageRating}}</span>
                   <span class="review-count">{{reviewCount}} reviews</span>
                 {{else}}
@@ -167,7 +157,7 @@
                   <span class="review-count">5 reviews</span>
                 {{/with}}
               </div>
-              <a href="/song/album1#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/album1#review';">
+              <a href="/song/6#review" class="add-review-btn-inline" title="Add Review" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/song/6#review';">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -181,12 +171,8 @@
 
   </main>
 
-  <!-- 
-    SIDEBAR (Right)
-  -->
   <aside class="sidebar-content">
     
-    <!-- "Your Highest Rated" Widget -->
     <section class="sidebar-widget glass-card">
       <a href="/my-reviews" style="text-decoration: none; color: inherit;">
         <h3 style="cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--spotify-green)'" onmouseout="this.style.color='var(--foreground)'">Your Highest Rated</h3>
@@ -217,7 +203,6 @@
   </aside>
 </div>
 
-<!-- "Your Recent Reviews" Section (aligned with main grid width) -->
 <section class="content-section home-recent-reviews">
   <h2>Your Recent Reviews</h2>
   {{#if recentReviews}}

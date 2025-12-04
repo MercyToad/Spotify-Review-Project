@@ -578,28 +578,68 @@
     });
   }
 
-  // Form validation - ensure rating is selected
+  /// Form validation and API submission
   const reviewForm = document.getElementById('addReviewForm');
+  
   if (reviewForm) {
     reviewForm.addEventListener('submit', function(e) {
+      // 1. Stop the page from reloading
+      e.preventDefault();
+
       const selectedRating = ratingInput.value;
+      const reviewText = document.getElementById('reviewText').value;
+      
+      // Get hidden inputs
+      const songId = reviewForm.querySelector('input[name="songId"]').value;
+      const songTitle = reviewForm.querySelector('input[name="songTitle"]').value;
+
+      // Validation
       if (!selectedRating || selectedRating === '') {
-        e.preventDefault();
         alert('Please select a star rating before submitting your review.');
         return false;
       }
 
-      // Clear any client-side deleted flag for this song so it can reappear
-      try {
-        const songIdInput = reviewForm.querySelector('input[name="songId"]');
-        const songId = songIdInput ? songIdInput.value : null;
-        if (songId) {
-          const deletedReviews = JSON.parse(localStorage.getItem('deletedReviews') || '[]');
-          const updated = deletedReviews.filter(id => id !== songId);
-          localStorage.setItem('deletedReviews', JSON.stringify(updated));
+      // 2. SEND DATA TO BACKEND 
+      fetch('/add-review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          songId: songId,
+          rating: selectedRating,
+          reviewText: reviewText,
+          songTitle: songTitle
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log("Saved to database!");
+        } else {
+          console.warn("Backend not ready yet, but frontend is working.");
         }
-      } catch (err) {
-        console.error('Error clearing deletedReviews for new review:', err);
+      })
+      .catch(error => console.error('Error:', error));
+
+      // 3. UPDATE UI IMMEDIATELY 
+      addNewReviewToTop({
+        rating: selectedRating,
+        reviewText: reviewText,
+        createdAt: 'Just now'
+      });
+
+      // 4. Hide the form
+      const addCard = document.querySelector('.add-review-card');
+      if (addCard) {
+        addCard.style.display = 'none';
+      }
+
+      // 5. Handle empty state removal
+      const reviewsList = document.getElementById('reviewsListContainer');
+      const emptyMessage = reviewsList.querySelector('p');
+      if (emptyMessage && reviewsList.children.length > 1) {
+        const emptyMsgContainer = emptyMessage.closest('.review-item');
+        if (emptyMsgContainer) emptyMsgContainer.style.display = 'none';
       }
     });
   }

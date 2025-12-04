@@ -15,10 +15,51 @@ const axios = require('axios'); // To make HTTP requests from our server. We'll 
 //-------------Connect to database--------------------//
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
+// create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
   extname: 'hbs',
   layoutsDir: path.join(__dirname, 'views/layouts'),
   partialsDir: path.join(__dirname, 'views/partials'),
+  helpers: {
+    // Helper to generate a loop (used for stars)
+    range: function (start, end) {
+      var n = [];
+      for (var i = start; i <= end; i++) {
+        n.push(i);
+      }
+      return n;
+    },
+    // Helper to compare values (equal)
+    eq: function (a, b) {
+      return a === b;
+    },
+    // Helper to compare values (greater than or equal)
+    gte: function (a, b) {
+      return a >= b;
+    },
+    // Helper to get part of a string (for initials in avatars)
+    substr: function (str, start, len) {
+      if (str && typeof str === 'string') {
+        return str.substring(start, len);
+      }
+      return str;
+    },
+    // Helper for math subtraction
+    subtract: function (a, b) {
+        return a - b;
+    },
+    // Helper for repeating blocks
+    times: function(n, block) {
+        var accum = '';
+        for(var i = 0; i < n; ++i)
+            accum += block.fn(i);
+        return accum;
+    },
+    // Helper to output JSON data
+    json: function (context) {
+      return JSON.stringify(context);
+    }
+  }
 });
 
 // Register `hbs` as our view engine using its bound `engine()` function.
@@ -293,6 +334,20 @@ app.get('/searchResults', async (req, res) => {
 
 // starting the server and keeping the connection open to listen for more requests
 // server?
+ // Song Details Page
+app.get('/song/:id', (req, res) => {
+  const username = req.session && req.session.user ? req.session.user.username : null;
+  const songId = req.params.id;
 
+  // Render the song-details view
+  // We pass the songId and username so the frontend has context
+  res.render('pages/song-detail', { 
+    layout: 'main', 
+    username: username,
+    // You can pass mock data here if you want the page to look populated immediately
+    // For now, this is enough to stop the "Cannot GET" error
+    track: { id: songId, name: 'Loading Song...' } 
+  });
+});
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
