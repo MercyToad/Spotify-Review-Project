@@ -123,51 +123,42 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const query = searchInput.value.trim();
       if (!query) return;
-      console.log("query" + query);
-
       try {
-          console.log("hello");
-          const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
-          console.log("goodbye");
-          const results = await response.json();
-          console.log(results);
-          const songs = results.tracks.items;
-          console.log("songs items: " + songs);
+        const response = await fetch(`/searchResults?song_name=${encodeURIComponent(query)}`);
+        const results = await response.json();
+        const songs = (results && results.tracks && results.tracks.items) ? results.tracks.items : [];
 
-          dropdown.innerHTML = '';
-          dropdown.style.display = null;
+        if (!dropdown) return;
+        dropdown.innerHTML = '';
+        dropdown.style.display = null;
 
-          if (results.length === 0) {
-              dropdown.innerHTML = '<div class="profile-menu-item">No results found</div>';
-              return;
-          }
+        if (!songs || songs.length === 0) {
+        dropdown.innerHTML = '<div class="profile-menu-item">No results found</div>';
+        return;
+        }
 
-          songs.forEach(item => {
-              const div = document.createElement('div');
-              div.classList.add('profile-menu-item');
-              div.textContent = "'" + item.name + "' by " + item.artists[0].name; 
-              
-              div.addEventListener('click', () => {
-                  window.location.href = `/my-reviews?song_id=${item.id}`;
-                  // const addReviewContainer = document.getElementById('reviewFormContainer');
-                  // addReviewContainer.style.display = null;
-                  // document.getElementById('songTitle').value = item.name;
-                  // document.getElementById('song-id-input').value = item.id;
-              });
+        songs.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('profile-menu-item');
+        div.textContent = "'" + item.name + "' by " + (item.artists && item.artists[0] ? item.artists[0].name : 'Unknown');
 
-              dropdown.appendChild(div);
-          });
+        div.addEventListener('click', () => {
+          window.location.href = `/my-reviews?song_id=${item.id}`;
+        });
 
+        dropdown.appendChild(div);
+        });
       } catch (error) {
-          console.error('Error fetching search results:', error);
+        console.error('Error fetching search results:', error);
       }
   });
 
-  document.addEventListener('click', (e) => {
+    document.addEventListener('click', (e) => {
+      if (!searchForm || !dropdown) return;
       if (!searchForm.contains(e.target)) {
-          dropdown.style.display = "none";
+        dropdown.style.display = "none";
       }
-  });
+    });
 
     // ------------------------------
     // Auth modal: open, close, switch views
@@ -256,13 +247,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ------------------------------
-    // FRONTEND-ONLY MOCK AUTH (no backend changes)
-    // - Stores a mock user in localStorage and updates header/menu on the client
-    // - Useful for frontend development when backend auth is not available
+    // Client-side UI for authenticated state
+    // - The backend is responsible for authentication and rendering a
+    //   `data-username` attribute on a page element when the user is logged in.
+    // - This client code will read that attribute (if present) and update
+    //   the profile accordion to show Logout. The actual logout action
+    //   should be implemented server-side at the `/logout` route.
     // ------------------------------
-    const MOCK_AUTH_KEY = 'mock_authenticated_user';
-
-    function applyMockLoggedInState(username) {
+    function applyLoggedInState(username) {
       const container = document.querySelector('.header-profile-container');
       if (!container) return;
 
@@ -287,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <a href="/my-reviews" class="profile-menu-item" role="menuitem"><span>My Reviews</span></a>
           <a href="/settings" class="profile-menu-item" role="menuitem"><span>Settings</span></a>
           <hr class="profile-menu-divider" />
-          <button id="mockLogout" class="profile-menu-item logout" role="menuitem"><span>Logout</span></button>
+          <button id="logoutBtn" class="profile-menu-item logout" role="menuitem"><span>Logout</span></button>
         `;
 
         // rebind click to close menu on items
@@ -299,14 +291,13 @@ document.addEventListener('DOMContentLoaded', function() {
           menu.setAttribute('aria-hidden', 'true');
         }));
 
-        // bind logout
-        const logoutBtn = document.getElementById('mockLogout');
+        // bind logout: delegate to server-side logout endpoint
+        const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
           logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            localStorage.removeItem(MOCK_AUTH_KEY);
-            // reload to simulate server-side logout — go to public landing page
-            window.location.href = '/';
+            // Redirect to server-side logout route; backend should clear session/cookie.
+            window.location.href = '/logout';
           });
         }
       }
@@ -314,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // need to get highly rated songs from user
     }
 
-    function clearMockLoggedInState() {
+    function clearLoggedInState() {
       const existingGreeting = document.querySelector('.mock-greeting');
       if (existingGreeting) existingGreeting.remove();
       const menu = document.getElementById('profileMenu');
@@ -327,55 +318,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const openBtn = document.getElementById('openAuthModal');
         if (openBtn) openBtn.addEventListener('click', function(e){ e.preventDefault(); showAuthModal('login'); });
       }
-
-      const songCards = document.querySelectorAll('.my-class');
     }
-
-    // If a mock user is stored, apply logged-in state on load
-    const storedMock = localStorage.getItem(MOCK_AUTH_KEY);
-    if (storedMock) {
-      try {
-        const parsed = JSON.parse(storedMock);
-        if (parsed && parsed.username) applyMockLoggedInState(parsed.username);
-      } catch (e) {
-        // ignore parse errors
+    // If the backend rendered a username on the page (e.g., <main data-username="...">),
+    // apply the logged-in UI state. This keeps authentication concerns on the backend
+    // while the frontend only updates the accordion/menu.
+    (function detectServerRenderedUser() {
+      const el = document.querySelector('[data-username]');
+      if (el && el.dataset && el.dataset.username) {
+        applyLoggedInState(el.dataset.username);
       }
-    }
-
-    // Intercept modal forms and perform frontend-only auth (mock)
-    const modalLoginForm = loginView ? loginView.querySelector('form') : null;
-    const modalRegisterForm = registerView ? registerView.querySelector('form') : null;
-
-    function handleMockAuthSubmit(formEl) {
-      if (!formEl) return;
-      const fd = new FormData(formEl);
-      const uname = fd.get('username') || fd.get('login-username') || '';
-      if (!uname || uname.trim().length < 1) {
-        // show a small inline error
-        let err = formEl.querySelector('.auth-error');
-        if (!err) { err = document.createElement('div'); err.className = 'auth-error error-message'; formEl.insertBefore(err, formEl.firstChild); }
-        err.textContent = 'Please provide a username.';
-        return;
-      }
-      // store mock user
-      localStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ username: uname.trim() }));
-      // apply and redirect to /home to simulate private home
-      applyMockLoggedInState(uname.trim());
-      hideAuthModal();
-      window.location.href = '/home';
-    }
-
-    if (modalLoginForm) {
-      modalLoginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleMockAuthSubmit(modalLoginForm);
-      });
-    }
-    if (modalRegisterForm) {
-      modalRegisterForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleMockAuthSubmit(modalRegisterForm);
-      });
-    }
-
+    })();
   });
