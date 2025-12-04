@@ -60,4 +60,73 @@ describe('Testing Register API No Username', () => {
   });
 });
 
+describe('Testing Register API Duplicate Username', () => {
+  it('negative : /register', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({username: 'username', password: 'password'})
+      .end((err, res) => {
+        expect(res).to.have.status(409);
+        // checks error code (409 = duplicate user name) but not the error text description
+        done();
+      });
+  });
+});
+
+describe('Testing Register API No Password', () => {
+  it('negative : /register', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({username: 'testuser123'})
+      .end((err, res) => {
+        expect(res).to.have.status(400);
+        // checks error code (400 = bad request) but not the error text description
+        done();
+      });
+  });
+});
+
+describe('Testing Login API', () => {
+  it('positive : /login', done => {
+    chai
+      .request(server)
+      .post('/login')
+      .send({username: 'username', password: 'password'})
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        done();
+      });
+  });
+});
+
+describe('Testing Login API Incorrect Password', () => {
+  it('negative : /login', done => {
+    chai
+      .request(server)
+      .post('/login')
+      .send({username: 'username', password: 'wrongpassword'})
+      .end((err, res) => {
+        expect(res).to.have.status(401);
+        // checks error code (401 = Wrong Password ): ) but not the error text description
+        done();
+      });
+  });
+});
+
+describe('Testing Login API No Password', () => {
+  it('negative : /login', done => {
+    chai
+      .request(server)
+      .post('/login')
+      .send({username: 'username'})
+      .end((err, res) => {
+        expect(res).to.have.status(400);
+        // checks error code (400 = bad request) but not the error text description
+        done();
+      });
+  });
+});
+
 // ********************************************************************************
