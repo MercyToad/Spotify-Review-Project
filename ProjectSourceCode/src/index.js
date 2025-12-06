@@ -366,6 +366,25 @@ app.post('/review', async (req, res) => {
       const data = await response.json();
       const insertQuery = `INSERT INTO songs (spotify_id, title, artist, album, average_rating) VALUES ('${req.body.song_id}', '${data.name}', '${data.artists[0].name}', '${data.album.name}', ${req.body.stars}) RETURNING song_id;`
       song_id = await db.oneOrNone(insertQuery);
+      const artistQuery = `SELECT name FROM artist WHERE name = '${data.artists[0].name}'`;
+      console.log(data.artists[0]);
+      artist_name = await db.oneOrNone(artistQuery);
+      if (!artist_name) {
+        const artists = await fetch(`https://api.spotify.com/v1/artists/${data.artists[0].id}`, { 
+        method: 'GET',
+        headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': bearer_token,
+        },
+        });
+        const artistsData = await artists.json();
+        insertArtistQuery = `INSERT INTO artist (name, genre) VALUES ('${data.artists[0].name}', '${artistsData.genres[0]}') RETURNING genre;`;
+        artist_name = await db.oneOrNone(insertArtistQuery);
+        console.log("??" + artist_name);
+        const artistQuery2 = `SELECT * FROM artist;`;
+        artist_name2 = await db.any(artistQuery2);
+        console.log(artist_name2);
+      }
       //get from spotify, fill in details
       // return song_id
       console.log(song_id);
