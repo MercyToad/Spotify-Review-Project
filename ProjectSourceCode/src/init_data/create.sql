@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS song_to_artist (
 -- Enumerated target types: can be 'song', 'artist', or 'playlist'
 -- CREATE TYPE review_target AS ENUM ('song', 'artist', 'playlist');
 
-CREATE TABLE IF NOT EXIST review (
+CREATE TABLE IF NOT EXISTS review (
     review_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     -- target_type review_target NOT NULL, --same thing here, will add in if we have time?

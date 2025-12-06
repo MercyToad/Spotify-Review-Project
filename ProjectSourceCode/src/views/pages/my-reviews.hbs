@@ -68,18 +68,18 @@
   <div id="reviewsList" style="margin-top:1.5rem; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem;">
     {{#if reviews}}
       {{#each reviews}}
-        <div class="review-card-long">
+        <div class="review-card-long glass-card">
           <div class="review-card-header">
-            <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text={{usernameChar}}" alt="Avatar">
+            <img class="review-user-avatar" src="https://placehold.co/40x40/22c55e/white?text=A" alt="Avatar">
             <div class="review-user-info">
-              <span>{{username}}</span>
-              <span class="review-timestamp">{{createdAt}}</span>
+              <span>{{../username}}</span>
             </div>
-            <div class="review-user-rating">&nbsp;</div>
+            <div class="review-user-rating">{{rating}}</div>
           </div>
           <div class="review-card-body">
-            <p class="review-song-title">{{songTitle}}</p>
-            <p class="review-text">{{reviewText}}</p>
+            <p class="review-song-title">{{title}}</p>
+            <p class="review-song-artist">{{artist}}</p>
+            <p class="review-text">"{{review_text}}"</p>
           </div>
         </div>
       {{/each}}

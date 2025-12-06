@@ -121,6 +121,14 @@ app.get('/', async (req, res) => {
 // Minimal My Reviews route (no API, frontend-only reviews)
 app.get('/my-reviews', async (req, res) => {
   const username = req.session && req.session.user ? req.session.user.username : 'Guest';
+  const userQuery = `SELECT user_id FROM users WHERE username = '${username}'`;
+  const user_id = await db.oneOrNone(userQuery);
+  // console.log(user_id);
+  if (!user_id) {
+    res.redirect('/login');
+  }
+  const myReviewsQuery = `SELECT review.user_id, review.title, review.review_text, review.rating, songs.artist FROM review JOIN songs ON review.song_id = songs.song_id WHERE review.user_id = '${user_id.user_id}';`;
+  const reviews = await db.any(myReviewsQuery);
   if (req.query.song_id) {
     const response = await fetch(`https://api.spotify.com/v1/tracks/${encodeURIComponent(req.query.song_id)}`, { 
     method: 'GET',
@@ -135,13 +143,14 @@ app.get('/my-reviews', async (req, res) => {
     console.log(songName);
     res.render('pages/my-reviews', 
       { layout: 'main',
-        username,
-        song_id: req.song_id,
+        username: username,
+        song_id: req.query.song_id,
         song_name: songName,
+        reviews: reviews,
        });
   }
   else {
-    res.render('pages/my-reviews', { layout: 'main', username, display: 'display:none;', });
+    res.render('pages/my-reviews', { layout: 'main', username: username, display: 'display:none;', reviews: reviews,});
   }
 });
 
@@ -336,11 +345,43 @@ app.get('/home', async (req, res) => {
 // ------------------- Review endpoints ----------------------
 
 app.post('/review', async (req, res) => {
-  console.log(req.body.song_id);
-  console.log(req.session.user.username);
-  const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.body.user_id}, ${req.body.song_id}, '${req.body.songTitle}', '${req.body.reviewText}', ${req.body.stars}) RETURNING review_id;`;
-  const review_id = await db.oneOrNone(query);
-  console.log(review_id);
+  try {
+    const userQuery = `SELECT user_id FROM users WHERE username = '${req.session.user.username}'`;
+    const user_id = await db.oneOrNone(userQuery);
+    console.log(user_id);
+    if (!user_id) {
+      res.redirect('/login');
+    }
+    console.log(req.body);
+    const songQuery = `SELECT song_id FROM songs WHERE spotify_id = '${req.body.song_id}'`;
+    let song_id = await db.oneOrNone(songQuery);
+    if (!song_id) {
+      const response = await fetch(`https://api.spotify.com/v1/tracks/${req.body.song_id}`, { 
+      method: 'GET',
+      headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': bearer_token,
+      },
+      });
+      const data = await response.json();
+      const insertQuery = `INSERT INTO songs (spotify_id, title, artist, album, average_rating) VALUES ('${req.body.song_id}', '${data.name}', '${data.artists[0].name}', '${data.album.name}', ${req.body.stars}) RETURNING song_id;`
+      song_id = await db.oneOrNone(insertQuery);
+      //get from spotify, fill in details
+      // return song_id
+      console.log(song_id);
+    }
+    const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${user_id.user_id}, ${song_id.song_id}, '${req.body.songTitle}', '${req.body.reviewText}', ${req.body.stars}) RETURNING review_id;`;
+    const review_id = await db.oneOrNone(query);
+    res.redirect('/my-reviews')
+  }
+  catch (error) {
+    console.error('Post error:', error);
+  }
+  // console.log(req.body.song_id);
+  // console.log(req.session.user.username);
+  // const query = `INSERT INTO review (user_id, song_id, title, review_text, rating) VALUES (${req.body.user_id}, ${req.body.song_id}, '${req.body.songTitle}', '${req.body.reviewText}', ${req.body.stars}) RETURNING review_id;`;
+  // const review_id = await db.oneOrNone(query);
+  // console.log(review_id);
   //update the average rating of the song
   // do something with the data
 });

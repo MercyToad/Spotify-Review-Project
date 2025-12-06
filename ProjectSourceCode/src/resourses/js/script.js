@@ -83,35 +83,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  if (reviewForm && reviewsList && reviewTemplate) {
+  // if (reviewForm && reviewsList && reviewTemplate) {
     // Compile the Handlebars template once for performance
-    const tpl = Handlebars.compile(reviewTemplate.innerHTML);
+    // const tpl = Handlebars.compile(reviewTemplate.innerHTML);
 
-    reviewForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(reviewForm);
-      const songTitle = formData.get('songTitle') || '';
-      const reviewText = formData.get('reviewText') || '';
+    // reviewForm.addEventListener('submit', function(e) {
+    //   e.preventDefault();
+    //   const formData = new FormData(reviewForm);
+    //   const songTitle = formData.get('songTitle') || '';
+    //   const reviewText = formData.get('reviewText') || '';
 
-      // Build a small review object for client-side rendering
-      const section = document.getElementById('myReviewsSection');
-      const username = section ? (section.dataset.username || 'Guest') : 'Guest';
-      const createdAt = new Date().toLocaleString();
-      const usernameChar = username.charAt(0).toUpperCase();
+    //   // Build a small review object for client-side rendering
+    //   const section = document.getElementById('myReviewsSection');
+    //   const username = section ? (section.dataset.username || 'Guest') : 'Guest';
+    //   const createdAt = new Date().toLocaleString();
+    //   const usernameChar = username.charAt(0).toUpperCase();
 
-      const created = { id: Date.now(), songTitle, reviewText, username, createdAt, usernameChar };
+    //   const created = { id: Date.now(), songTitle, reviewText, username, createdAt, usernameChar };
 
-      // Render and prepend the new review into the reviews list
-      const html = tpl(created);
-      const div = document.createElement('div');
-      div.innerHTML = html;
-      reviewsList.insertBefore(div.firstElementChild, reviewsList.firstChild);
+    //   // Render and prepend the new review into the reviews list
+    //   const html = tpl(created);
+    //   const div = document.createElement('div');
+    //   div.innerHTML = html;
+    //   reviewsList.insertBefore(div.firstElementChild, reviewsList.firstChild);
 
-      // Reset form and hide it
-      reviewForm.reset();
-      formContainer.style.display = 'none';
-    });
-  }
+    //   // Reset form and hide it
+    //   reviewForm.reset();
+    //   formContainer.style.display = 'none';
+    // });
+  // }
 
   // search function
   const searchForm = document.getElementById('search-form');
